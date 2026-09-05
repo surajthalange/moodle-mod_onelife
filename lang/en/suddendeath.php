@@ -54,3 +54,4 @@ $string['suddendeath:play'] = 'Play a Sudden Death run';
 $string['suddendeath:view'] = 'View a Sudden Death activity';
 $string['suddendeathname'] = 'Activity name';
 $string['suddendeathname_help'] = 'The name shown to learners on the course page.';
+$string['warningtopicbankunusable'] = 'The configured topic bank category is no longer usable, so topics have been detected automatically instead. Check the activity settings.';
