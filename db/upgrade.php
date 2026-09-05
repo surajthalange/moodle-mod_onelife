@@ -15,18 +15,23 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version details for mod_suddendeath.
+ * Upgrade steps for mod_suddendeath.
  *
  * @package    mod_suddendeath
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'mod_suddendeath';
-$plugin->version = 2026090601;
-// Moodle 4.5 LTS is the supported floor (see PRD section 3). 4.1 is deliberately not supported.
-$plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.1.0';
+/**
+ * Execute the mod_suddendeath upgrade steps from the given old version.
+ *
+ * The plugin has not been released, so there are no versions in the wild to
+ * upgrade from and this function is intentionally empty. Savepoints will be
+ * added here from the first public release onwards.
+ *
+ * @param int $oldversion the version we are upgrading from
+ * @return bool always true
+ */
+function xmldb_suddendeath_upgrade($oldversion) {
+    return true;
+}

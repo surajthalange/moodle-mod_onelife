@@ -15,18 +15,24 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version details for mod_suddendeath.
+ * The mod_suddendeath instance list viewed event.
  *
  * @package    mod_suddendeath
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_suddendeath\event;
 
-$plugin->component = 'mod_suddendeath';
-$plugin->version = 2026090601;
-// Moodle 4.5 LTS is the supported floor (see PRD section 3). 4.1 is deliberately not supported.
-$plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.1.0';
+/**
+ * Fired when the list of Sudden Death activities in a course is viewed.
+ *
+ * core\event\course_module_instance_list_viewed is abstract, so each module
+ * supplies its own concrete subclass.
+ *
+ * @package    mod_suddendeath
+ * @copyright  2026 Suraj Thalange
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+}
