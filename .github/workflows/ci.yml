@@ -1,0 +1,143 @@
+name: Moodle Plugin CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: M${{ matrix.moodle-branch }} / PHP ${{ matrix.php }} / ${{ matrix.database }}
+    runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: ${{ matrix.database == 'pgsql' && 'postgres:17' || '' }}
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+
+      mariadb:
+        image: ${{ matrix.database == 'mariadb' && 'mariadb:11' || '' }}
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
+          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval 10s --health-timeout 5s --health-retries 3
+
+    strategy:
+      fail-fast: false
+      # PHP versions are the minimum and maximum each Moodle branch is itself tested
+      # against, taken from that branch's own .github/workflows/push.yml and
+      # cross-checked against its composer.json "php" constraint. They are not guesses,
+      # and they are not a single value carried across branches:
+      #
+      #   MOODLE_405_STABLE  PHP 8.1 - 8.3   PHPUnit ^9.6.34
+      #   MOODLE_500_STABLE  PHP 8.2 - 8.4   PHPUnit ^11
+      #   MOODLE_501_STABLE  PHP 8.2 - 8.4   PHPUnit ^11
+      #   MOODLE_502_STABLE  PHP 8.3 - 8.4   PHPUnit ^11
+      #
+      # 4.5 LTS is the PRD's supported floor and the only branch still on PHPUnit 9.6,
+      # which predates the attributes API. That is precisely the gap this workflow
+      # exists to cover, so it must never be dropped to make the matrix green.
+      #
+      # Both databases are tested rather than one. The plugin ships XMLDB schema and
+      # deletes across three tables, and install and cascade behaviour is exactly where
+      # engine differences bite; a single database would not exercise that.
+      matrix:
+        include:
+          - {moodle-branch: MOODLE_405_STABLE, php: '8.1', database: pgsql}
+          - {moodle-branch: MOODLE_405_STABLE, php: '8.1', database: mariadb}
+          - {moodle-branch: MOODLE_405_STABLE, php: '8.3', database: pgsql}
+          - {moodle-branch: MOODLE_405_STABLE, php: '8.3', database: mariadb}
+          - {moodle-branch: MOODLE_500_STABLE, php: '8.2', database: pgsql}
+          - {moodle-branch: MOODLE_500_STABLE, php: '8.2', database: mariadb}
+          - {moodle-branch: MOODLE_500_STABLE, php: '8.4', database: pgsql}
+          - {moodle-branch: MOODLE_500_STABLE, php: '8.4', database: mariadb}
+          - {moodle-branch: MOODLE_501_STABLE, php: '8.2', database: pgsql}
+          - {moodle-branch: MOODLE_501_STABLE, php: '8.2', database: mariadb}
+          - {moodle-branch: MOODLE_501_STABLE, php: '8.4', database: pgsql}
+          - {moodle-branch: MOODLE_501_STABLE, php: '8.4', database: mariadb}
+          - {moodle-branch: MOODLE_502_STABLE, php: '8.3', database: pgsql}
+          - {moodle-branch: MOODLE_502_STABLE, php: '8.3', database: mariadb}
+          - {moodle-branch: MOODLE_502_STABLE, php: '8.4', database: pgsql}
+          - {moodle-branch: MOODLE_502_STABLE, php: '8.4', database: mariadb}
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+        with:
+          path: plugin
+          persist-credentials: false
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ matrix.extensions }}
+          ini-values: max_input_vars=5000, opcache.enable_cli=1
+          # Keep "none" while there is no coverage reporting. With "none" PHPUnit falls
+          # back to phpdbg only if coverage is actually requested, which it is not.
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+          echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
+
+      - name: Install moodle-plugin-ci
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+
+      - name: PHP Lint
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phplint
+
+      - name: PHP Mess Detector
+        continue-on-error: true # Advisory only: reports findings without failing the build.
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpmd
+
+      - name: Moodle Code Checker
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpcs --max-warnings 0
+
+      - name: Validating
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci validate
+
+      - name: Check upgrade savepoints
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci savepoints
+
+      - name: Mustache Lint
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci mustache
+
+      - name: Grunt
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci grunt --max-lint-warnings 0
+
+      - name: PHPUnit tests
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpunit --fail-on-warning
+
+      # Behat is deliberately absent. There are no feature files yet: Behat coverage is
+      # PRD build step 10, and the activity is not playable until build step 6. Adding
+      # the step now would either fail on a missing suite or pass vacuously, and a step
+      # that cannot fail is worse than no step. Restore it from the upstream
+      # gha.dist.yml, together with the Behat faildump upload, at build step 10.
+
+      - name: Mark cancelled jobs as failed.
+        if: ${{ cancelled() }}
+        run: exit 1
