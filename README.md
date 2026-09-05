@@ -1,5 +1,7 @@
 # Sudden Death
 
+[![Moodle Plugin CI](https://github.com/surajthalange/moodle-mod_suddendeath/actions/workflows/ci.yml/badge.svg)](https://github.com/surajthalange/moodle-mod_suddendeath/actions/workflows/ci.yml)
+
 A Moodle activity module giving learners a self-directed, streak-based revision tool built
 from a course's question bank.
 
