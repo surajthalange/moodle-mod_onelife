@@ -24,6 +24,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['explanationconvention'] = 'Explanations in question feedback';
+$string['explanationconvention_help'] = 'After each answer, Sudden Death shows the learner an explanation taken from the question\'s general feedback.
+
+Where the general feedback contains a horizontal rule, only the part **after the first rule** is shown as the explanation. Anything before it is treated as a lead-in and is not displayed.
+
+Where the general feedback contains no horizontal rule, all of it is shown.
+
+This lets you write a short congratulatory line for the question bank and a longer teaching explanation for Sudden Death, in one field:
+
+> Correct!
+> ---
+> Photosynthesis converts light energy into chemical energy stored as glucose.
+
+Be aware of this if you already use horizontal rules for visual separation: the first one will split your feedback, and everything above it will be hidden from the learner.';
 $string['modulename'] = 'Sudden Death';
 $string['modulename_help'] = 'Sudden Death is a self-directed revision activity built from the course question bank.
 

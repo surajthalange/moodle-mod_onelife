@@ -19,6 +19,22 @@ streak. Personal bests are tracked per scope so there is always something to bea
 The activity is **deliberately ungraded**. That is a design decision, not an omission: the
 plugin is low-stakes practice and staying out of the gradebook is part of the positioning.
 
+## Writing explanations in question feedback
+
+After each answer the learner is shown an explanation, taken from the question's **general
+feedback**.
+
+If the general feedback contains a horizontal rule, only the part *after the first rule* is
+shown. If it contains no rule, all of it is shown. That lets one field serve both the question
+bank and this activity:
+
+    Correct!
+    ---
+    Photosynthesis converts light energy into chemical energy stored as glucose.
+
+If you already use horizontal rules for visual separation, note that the first one will split
+the feedback and everything above it will be hidden from the learner.
+
 ## Positioning against mod_game
 
 `mod_game` is a teacher-configured game activity: the teacher chooses the source and the
