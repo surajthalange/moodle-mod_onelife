@@ -1,0 +1,8 @@
+# Moodle / editor / OS noise
+/vendor/
+/node_modules/
+/.idea/
+/.vscode/
+*.log
+Thumbs.db
+.DS_Store
