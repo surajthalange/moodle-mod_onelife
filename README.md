@@ -33,13 +33,36 @@ implemented by [`mod_game`](https://moodle.org/plugins/mod_game) (GPLv3) by
 This plugin is a fresh implementation. No source is copied from `mod_game` or from any other
 existing plugin.
 
+## Installation
+
+Clone into your Moodle tree, then visit **Site administration → Notifications** to complete
+the install.
+
+Moodle 5.1 and later moved the codebase under `public/` (MDL-83424), so the path differs by
+version:
+
+    # Moodle 5.1+
+    git clone https://github.com/surajthalange/moodle-mod_suddendeath.git \
+      <moodle>/public/mod/suddendeath
+
+    # Moodle 4.5 - 5.0
+    git clone https://github.com/surajthalange/moodle-mod_suddendeath.git \
+      <moodle>/mod/suddendeath
+
+The directory must be named `suddendeath`, not the repository name.
+
 ## Development
 
-This repository is the source of truth for the plugin. The Moodle installation is disposable
-infrastructure; the plugin is linked into it with a Windows directory junction:
+The working copy lives inside the Moodle tree, so treat this GitHub remote as the backup of
+record: a Moodle reinstall removes the local directory. Push before wiping a Moodle install.
 
-    New-Item -ItemType Junction `
-      -Path   'C:\laragon\www\personal\moodle\public\mod\suddendeath' `
-      -Target 'C:\laragon\www\personal\plugins\moodle-mod_suddendeath'
+Checks, from a `moodle-plugin-ci` installation:
 
-See `C:\laragon\www\personal\OPERATIONS.md` for machine-specific commands.
+    php ci/bin/moodle-plugin-ci phplint <path-to-plugin>
+    php ci/bin/moodle-plugin-ci phpcs   <path-to-plugin>
+    php ci/bin/moodle-plugin-ci validate --moodle=<moodle> <path-to-plugin>
+
+Unit tests, from the Moodle root:
+
+    php public/admin/tool/phpunit/cli/init.php
+    php vendor/phpunit/phpunit/phpunit public/mod/suddendeath/tests/engine_test.php
