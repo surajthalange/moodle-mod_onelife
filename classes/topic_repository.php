@@ -139,6 +139,22 @@ final class topic_repository {
     }
 
     /**
+     * Whether a category can serve as this course's topic bank.
+     *
+     * Used by the settings form to reject an explicit id that does not exist, sits in
+     * a context this course cannot reach, or has no topics under it. The select is
+     * built from reachable categories, so a bad value can only arrive by tampering or
+     * by the category being deleted after it was chosen.
+     *
+     * @param int $courseid the course
+     * @param int $categoryid the candidate category
+     * @return bool true when the category is usable as a bank
+     */
+    public function is_usable_bank(int $courseid, int $categoryid): bool {
+        return $this->usable_category($categoryid, $this->get_context_ids($courseid)) !== null;
+    }
+
+    /**
      * The topics offered by a bank: its immediate children, ordered by name.
      *
      * A topic is not required to hold questions itself. Topic categories are

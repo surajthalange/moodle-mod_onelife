@@ -24,6 +24,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['allowedmodes'] = 'Allowed scope modes';
+$string['allowedmodes_help'] = 'Which ways of choosing what to practise the learner may use.
+
+* **One topic** - the learner picks a single topic.
+* **Selected topics** - the learner picks any combination of topics.
+* **All topics** - the learner plays the whole bank.
+
+At least one must be permitted.';
+$string['completionstreak'] = 'Learner must reach a streak of';
+$string['completionstreak_help'] = 'When set, the activity is marked complete once the learner reaches this streak in a single run. Leave it blank, or set it to 0, to disable the rule.';
+$string['completionstreakgroup'] = 'Reach a streak';
+$string['errcompletionstreak'] = 'Enter a whole number of 0 or more, or leave this blank to disable the rule.';
+$string['errnomodes'] = 'Permit at least one scope mode.';
+$string['errtargetstreak'] = 'Enter a whole number of 1 or more.';
+$string['errtopicbank'] = 'That topic bank is not available to this course. Choose another, or use auto-detect.';
 $string['explanationconvention'] = 'Explanations in question feedback';
 $string['explanationconvention_help'] = 'After each answer, Sudden Death shows the learner an explanation taken from the question\'s general feedback.
 
@@ -38,6 +53,9 @@ This lets you write a short congratulatory line for the question bank and a long
 > Photosynthesis converts light energy into chemical energy stored as glucose.
 
 Be aware of this if you already use horizontal rules for visual separation: the first one will split your feedback, and everything above it will be hidden from the learner.';
+$string['mode_all'] = 'All topics';
+$string['mode_multi'] = 'Selected topics';
+$string['mode_single'] = 'One topic';
 $string['modulename'] = 'Sudden Death';
 $string['modulename_help'] = 'Sudden Death is a self-directed revision activity built from the course question bank.
 
@@ -54,4 +72,16 @@ $string['suddendeath:play'] = 'Play a Sudden Death run';
 $string['suddendeath:view'] = 'View a Sudden Death activity';
 $string['suddendeathname'] = 'Activity name';
 $string['suddendeathname_help'] = 'The name shown to learners on the course page.';
+$string['targetstreak'] = 'Target streak';
+$string['targetstreak_help'] = 'The streak that counts as 100% in the run summary.
+
+It does not cap the run. A learner may keep going past it, and the streak itself is reported uncapped.';
+$string['topicbank'] = 'Topic bank';
+$string['topicbank_help'] = 'The question category whose child categories become the topics a learner can choose from.
+
+Leave this on **Auto-detect** to let the activity find the bank itself. It searches the question bank contexts available to this course, nearest first, and skips the "Default for..." category Moodle creates automatically.
+
+Choose a category explicitly only if auto-detection picks the wrong one.';
+$string['topicbankautodetect'] = 'Auto-detect';
+$string['topicbanknone'] = 'No usable question bank was found for this course. Add categories containing questions to the course question bank, then edit this activity again.';
 $string['warningtopicbankunusable'] = 'The configured topic bank category is no longer usable, so topics have been detected automatically instead. Check the activity settings.';
