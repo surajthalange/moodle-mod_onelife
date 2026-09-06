@@ -24,22 +24,22 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
 use stdClass;
 
 /**
  * Tests for the picker_page class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\output\picker_page
+ * @covers     \mod_onelife\output\picker_page
  */
 final class picker_page_test extends \advanced_testcase {
     /**
@@ -79,7 +79,7 @@ final class picker_page_test extends \advanced_testcase {
 
         $page = new picker_page($this->instance_stub($allowedmodes), $topics, $hasbank, $formhtml, $warnings);
 
-        return $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        return $page->export_for_template($PAGE->get_renderer('mod_onelife'));
     }
 
     /**
@@ -93,7 +93,7 @@ final class picker_page_test extends \advanced_testcase {
      * @return string the rendered form
      */
     private function render_form(array $allowedmodes, array $topics): string {
-        $form = new \mod_suddendeath\form\scope_picker_form(null, [
+        $form = new \mod_onelife\form\scope_picker_form(null, [
             'modes' => $allowedmodes,
             'topics' => $topics,
             'cmid' => 1,
@@ -114,9 +114,9 @@ final class picker_page_test extends \advanced_testcase {
 
         $html = $this->render_form(['single', 'all'], [11 => 'Cells']);
 
-        $this->assertStringContainsString(get_string('mode_single', 'mod_suddendeath'), $html);
-        $this->assertStringContainsString(get_string('mode_all', 'mod_suddendeath'), $html);
-        $this->assertStringNotContainsString(get_string('mode_multi', 'mod_suddendeath'), $html);
+        $this->assertStringContainsString(get_string('mode_single', 'mod_onelife'), $html);
+        $this->assertStringContainsString(get_string('mode_all', 'mod_onelife'), $html);
+        $this->assertStringNotContainsString(get_string('mode_multi', 'mod_onelife'), $html);
     }
 
     /**
@@ -128,8 +128,8 @@ final class picker_page_test extends \advanced_testcase {
 
         $html = $this->render_form(['multi'], [11 => 'Cells']);
 
-        $this->assertStringContainsString(get_string('mode_multi', 'mod_suddendeath'), $html);
-        $this->assertStringNotContainsString(get_string('mode_single', 'mod_suddendeath'), $html);
+        $this->assertStringContainsString(get_string('mode_multi', 'mod_onelife'), $html);
+        $this->assertStringNotContainsString(get_string('mode_single', 'mod_onelife'), $html);
     }
 
     /**
@@ -187,15 +187,15 @@ final class picker_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $context = $this->export('all', [11 => 'Cells']);
 
         $this->assertFalse($context->hasrecords);
         $this->assertSame([], $context->records);
 
-        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
-        $this->assertStringContainsString(get_string('norecordsyet', 'mod_suddendeath'), $html);
-        $this->assertStringNotContainsString('suddendeath-records__table', $html);
+        $html = $renderer->render_from_template('mod_onelife/picker', $context);
+        $this->assertStringContainsString(get_string('norecordsyet', 'mod_onelife'), $html);
+        $this->assertStringNotContainsString('onelife-records__table', $html);
     }
 
     /**
@@ -214,10 +214,10 @@ final class picker_page_test extends \advanced_testcase {
             [],
             [$this->record('multi', ['Cells', 'Genetics'])]
         );
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $scope = $context->records[0]['scope'];
-        $this->assertStringContainsString(get_string('mode_multi', 'mod_suddendeath'), $scope);
+        $this->assertStringContainsString(get_string('mode_multi', 'mod_onelife'), $scope);
         $this->assertStringContainsString('Cells', $scope);
         $this->assertStringContainsString('Genetics', $scope);
         $this->assertStringNotContainsString('multi:', $scope, 'A raw code must never be shown.');
@@ -239,9 +239,9 @@ final class picker_page_test extends \advanced_testcase {
             [],
             [$this->record('all', ['Cells', 'Genetics'])]
         );
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
-        $this->assertSame(get_string('mode_all', 'mod_suddendeath'), $context->records[0]['scope']);
+        $this->assertSame(get_string('mode_all', 'mod_onelife'), $context->records[0]['scope']);
     }
 
     /**
@@ -255,25 +255,25 @@ final class picker_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $page = new picker_page(
             $this->instance_stub('single'),
             [11 => 'Cells'],
             true,
             '<form></form>',
             [],
-            [$this->record('single', [get_string('deletedtopic', 'mod_suddendeath')])]
+            [$this->record('single', [get_string('deletedtopic', 'mod_onelife')])]
         );
         $context = $page->export_for_template($renderer);
 
         $this->assertTrue($context->hasrecords);
         $this->assertStringContainsString(
-            get_string('deletedtopic', 'mod_suddendeath'),
+            get_string('deletedtopic', 'mod_onelife'),
             $context->records[0]['scope']
         );
 
-        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
-        $this->assertStringContainsString(get_string('deletedtopic', 'mod_suddendeath'), $html);
+        $html = $renderer->render_from_template('mod_onelife/picker', $context);
+        $this->assertStringContainsString(get_string('deletedtopic', 'mod_onelife'), $html);
     }
 
     /**
@@ -284,7 +284,7 @@ final class picker_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $page = new picker_page(
             $this->instance_stub('all'),
             [11 => 'Cells'],
@@ -293,11 +293,11 @@ final class picker_page_test extends \advanced_testcase {
             [],
             [$this->record('all', [], 12)]
         );
-        $html = $renderer->render_from_template('mod_suddendeath/picker', $page->export_for_template($renderer));
+        $html = $renderer->render_from_template('mod_onelife/picker', $page->export_for_template($renderer));
 
-        $this->assertStringContainsString('suddendeath-records__table', $html);
+        $this->assertStringContainsString('onelife-records__table', $html);
         $this->assertStringContainsString('12', $html);
-        $this->assertStringNotContainsString(get_string('norecordsyet', 'mod_suddendeath'), $html);
+        $this->assertStringNotContainsString(get_string('norecordsyet', 'mod_onelife'), $html);
     }
 
     /**
@@ -399,13 +399,13 @@ final class picker_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $context = $this->export('single,multi,all', [11 => 'Cells', 12 => 'Genetics']);
 
-        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
+        $html = $renderer->render_from_template('mod_onelife/picker', $context);
 
         $this->assertStringContainsString('Revision Sprint', $html);
-        $this->assertStringContainsString('suddendeath-picker', $html);
+        $this->assertStringContainsString('onelife-picker', $html);
         // The form is passed through untouched, which is the template's whole job here.
         $this->assertStringContainsString('<form></form>', $html);
     }
@@ -418,11 +418,11 @@ final class picker_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $context = $this->export('single,multi,all', [], false);
 
-        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
+        $html = $renderer->render_from_template('mod_onelife/picker', $context);
 
-        $this->assertStringContainsString(get_string('topicbanknone', 'mod_suddendeath'), $html);
+        $this->assertStringContainsString(get_string('topicbanknone', 'mod_onelife'), $html);
     }
 }

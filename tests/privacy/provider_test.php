@@ -25,12 +25,12 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\privacy;
+namespace mod_onelife\privacy;
 
 use context_module;
 use core_privacy\local\request\approved_contextlist;
@@ -40,12 +40,12 @@ use core_privacy\local\request\writer;
 use stdClass;
 
 /**
- * Tests for the mod_suddendeath privacy provider.
+ * Tests for the mod_onelife privacy provider.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\privacy\provider
+ * @covers     \mod_onelife\privacy\provider
  */
 final class provider_test extends \core_privacy\tests\provider_testcase {
     /** @var stdClass The course. */
@@ -73,8 +73,8 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->userid = (int) $this->getDataGenerator()->create_user()->id;
         $this->otheruserid = (int) $this->getDataGenerator()->create_user()->id;
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $this->course->id]);
-        $this->otherinstance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $this->course->id]);
+        $this->instance = $this->getDataGenerator()->create_module('onelife', ['course' => $this->course->id]);
+        $this->otherinstance = $this->getDataGenerator()->create_module('onelife', ['course' => $this->course->id]);
 
         $this->make_run((int) $this->instance->id, $this->userid, 7);
         $this->make_run((int) $this->instance->id, $this->otheruserid, 4);
@@ -84,16 +84,16 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Record a finished run with one answer.
      *
-     * @param int $suddendeathid the instance
+     * @param int $onelifeid the instance
      * @param int $userid the learner
      * @param int $streak the streak reached
      * @return int the run id
      */
-    private function make_run(int $suddendeathid, int $userid, int $streak): int {
+    private function make_run(int $onelifeid, int $userid, int $streak): int {
         global $DB;
 
-        $runid = (int) $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $suddendeathid,
+        $runid = (int) $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $onelifeid,
             'userid' => $userid,
             'scopetype' => 'all',
             'topicids' => '3,4',
@@ -104,7 +104,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
             'timefinish' => time() - 100,
         ]);
 
-        $DB->insert_record('suddendeath_answer', (object) [
+        $DB->insert_record('onelife_answer', (object) [
             'runid' => $runid,
             'topicid' => 3,
             'questionid' => 55,
@@ -123,7 +123,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
      */
     private function context_for(stdClass $instance): context_module {
         return context_module::instance(
-            get_coursemodule_from_instance('suddendeath', $instance->id)->id
+            get_coursemodule_from_instance('onelife', $instance->id)->id
         );
     }
 
@@ -136,7 +136,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
     public function test_metadata_declares_every_stored_field(): void {
         global $DB;
 
-        $collection = provider::get_metadata(new \core_privacy\local\metadata\collection('mod_suddendeath'));
+        $collection = provider::get_metadata(new \core_privacy\local\metadata\collection('mod_onelife'));
         $items = $collection->get_collection();
 
         $declared = [];
@@ -144,10 +144,10 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
             $declared[$item->get_name()] = array_keys($item->get_privacy_fields());
         }
 
-        $this->assertArrayHasKey('suddendeath_run', $declared);
-        $this->assertArrayHasKey('suddendeath_answer', $declared);
+        $this->assertArrayHasKey('onelife_run', $declared);
+        $this->assertArrayHasKey('onelife_answer', $declared);
 
-        foreach (['suddendeath_run', 'suddendeath_answer'] as $table) {
+        foreach (['onelife_run', 'onelife_answer'] as $table) {
             $columns = array_keys($DB->get_columns($table));
             foreach ($columns as $column) {
                 if ($column === 'id') {
@@ -195,12 +195,12 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->set_up();
 
         $context = $this->context_for($this->instance);
-        $this->export_context_data_for_user($this->userid, $context, 'mod_suddendeath');
+        $this->export_context_data_for_user($this->userid, $context, 'mod_onelife');
 
         $writer = writer::with_context($context);
         $this->assertTrue($writer->has_any_data());
 
-        $data = $writer->get_data([get_string('privacy:path:runs', 'mod_suddendeath')]);
+        $data = $writer->get_data([get_string('privacy:path:runs', 'mod_onelife')]);
         $this->assertNotEmpty($data);
 
         $streaks = array_map(static fn($run) => (int) $run['streak'], (array) $data->runs);
@@ -219,22 +219,22 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $context = $this->context_for($this->instance);
         provider::delete_data_for_user(new approved_contextlist(
             \core_user::get_user($this->userid),
-            'mod_suddendeath',
+            'mod_onelife',
             [$context->id]
         ));
 
         $this->assertSame(
             0,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id, 'userid' => $this->userid])
+            $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id, 'userid' => $this->userid])
         );
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id, 'userid' => $this->otheruserid]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id, 'userid' => $this->otheruserid]),
             "Another learner's run must survive."
         );
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->otherinstance->id, 'userid' => $this->userid]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->otherinstance->id, 'userid' => $this->userid]),
             'A run in an unapproved context must survive.'
         );
     }
@@ -249,13 +249,13 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
 
         provider::delete_data_for_user(new approved_contextlist(
             \core_user::get_user($this->userid),
-            'mod_suddendeath',
+            'mod_onelife',
             [$this->context_for($this->instance)->id]
         ));
 
         $orphans = $DB->count_records_sql(
-            'SELECT COUNT(1) FROM {suddendeath_answer} a
-               LEFT JOIN {suddendeath_run} r ON r.id = a.runid
+            'SELECT COUNT(1) FROM {onelife_answer} a
+               LEFT JOIN {onelife_run} r ON r.id = a.runid
               WHERE r.id IS NULL'
         );
         $this->assertSame(0, $orphans, 'Deleting runs must take their answers with them.');
@@ -271,10 +271,10 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
 
         provider::delete_data_for_all_users_in_context($this->context_for($this->instance));
 
-        $this->assertSame(0, $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id]));
+        $this->assertSame(0, $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id]));
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->otherinstance->id]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->otherinstance->id]),
             'Another activity must be untouched.'
         );
     }
@@ -286,7 +286,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->set_up();
 
         $context = $this->context_for($this->instance);
-        $userlist = new userlist($context, 'mod_suddendeath');
+        $userlist = new userlist($context, 'mod_onelife');
         provider::get_users_in_context($userlist);
 
         $found = array_map('intval', $userlist->get_userids());
@@ -306,17 +306,17 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $context = $this->context_for($this->instance);
         provider::delete_data_for_users(new approved_userlist(
             $context,
-            'mod_suddendeath',
+            'mod_onelife',
             [$this->userid]
         ));
 
         $this->assertSame(
             0,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id, 'userid' => $this->userid])
+            $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id, 'userid' => $this->userid])
         );
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id, 'userid' => $this->otheruserid]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id, 'userid' => $this->otheruserid]),
             'A learner who was not approved for deletion must keep their data.'
         );
     }

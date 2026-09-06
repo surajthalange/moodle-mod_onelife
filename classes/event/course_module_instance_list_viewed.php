@@ -15,22 +15,22 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The mod_suddendeath instance list viewed event.
+ * The mod_onelife instance list viewed event.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\event;
+namespace mod_onelife\event;
 
 /**
- * Fired when the list of Sudden Death activities in a course is viewed.
+ * Fired when the list of One Life activities in a course is viewed.
  *
  * core\event\course_module_instance_list_viewed is abstract, so each module
  * supplies its own concrete subclass.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

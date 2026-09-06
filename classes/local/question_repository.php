@@ -17,23 +17,23 @@
 /**
  * Builds the pool of questions a run may draw on.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use stdClass;
 
 /**
- * Finds and loads the questions a Sudden Death run can ask.
+ * Finds and loads the questions a One Life run can ask.
  *
  * This is the querying half of PRD section 6.1's select_question. The choosing half
  * stays pure in engine, because engine's freedom from the database is a tested
  * property and injecting a pool would only move the query somewhere less obvious.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Library of interface functions and constants for mod_suddendeath.
+ * Library of interface functions and constants for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@
  * @param string $feature one of the FEATURE_* constants
  * @return mixed true or false when the feature is known, null otherwise
  */
-function suddendeath_supports($feature) {
+function onelife_supports($feature) {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -58,36 +58,36 @@ function suddendeath_supports($feature) {
 }
 
 /**
- * Create a new Sudden Death instance.
+ * Create a new One Life instance.
  *
  * @param stdClass $moduleinstance data from the module form
- * @param mod_suddendeath_mod_form|null $mform the form itself, unused here
+ * @param mod_onelife_mod_form|null $mform the form itself, unused here
  * @return int id of the new instance
  */
-function suddendeath_add_instance($moduleinstance, $mform = null) {
+function onelife_add_instance($moduleinstance, $mform = null) {
     global $DB;
 
     $now = time();
     $moduleinstance->timecreated = $now;
     $moduleinstance->timemodified = $now;
 
-    return $DB->insert_record('suddendeath', $moduleinstance);
+    return $DB->insert_record('onelife', $moduleinstance);
 }
 
 /**
- * Update an existing Sudden Death instance.
+ * Update an existing One Life instance.
  *
  * @param stdClass $moduleinstance data from the module form
- * @param mod_suddendeath_mod_form|null $mform the form itself, unused here
+ * @param mod_onelife_mod_form|null $mform the form itself, unused here
  * @return bool true on success
  */
-function suddendeath_update_instance($moduleinstance, $mform = null) {
+function onelife_update_instance($moduleinstance, $mform = null) {
     global $DB;
 
     $moduleinstance->timemodified = time();
     $moduleinstance->id = $moduleinstance->instance;
 
-    return $DB->update_record('suddendeath', $moduleinstance);
+    return $DB->update_record('onelife', $moduleinstance);
 }
 
 /**
@@ -101,11 +101,11 @@ function suddendeath_update_instance($moduleinstance, $mform = null) {
  * @param stdClass $coursemodule the course module
  * @return cached_cm_info|false the info, or false when the instance is missing
  */
-function suddendeath_get_coursemodule_info($coursemodule) {
+function onelife_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $fields = 'id, name, intro, introformat, completionstreak';
-    $instance = $DB->get_record('suddendeath', ['id' => $coursemodule->instance], $fields);
+    $instance = $DB->get_record('onelife', ['id' => $coursemodule->instance], $fields);
     if (!$instance) {
         return false;
     }
@@ -114,7 +114,7 @@ function suddendeath_get_coursemodule_info($coursemodule) {
     $info->name = $instance->name;
 
     if ($coursemodule->showdescription) {
-        $info->content = format_module_intro('suddendeath', $instance, $coursemodule->id, false);
+        $info->content = format_module_intro('onelife', $instance, $coursemodule->id, false);
     }
 
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
@@ -125,27 +125,27 @@ function suddendeath_get_coursemodule_info($coursemodule) {
 }
 
 /**
- * Delete a Sudden Death instance along with every run and answer belonging to it.
+ * Delete a One Life instance along with every run and answer belonging to it.
  *
  * @param int $id id of the instance to remove
  * @return bool true on success, false when the instance does not exist
  */
-function suddendeath_delete_instance($id) {
+function onelife_delete_instance($id) {
     global $DB;
 
-    $moduleinstance = $DB->get_record('suddendeath', ['id' => $id]);
+    $moduleinstance = $DB->get_record('onelife', ['id' => $id]);
     if (!$moduleinstance) {
         return false;
     }
 
     // Answers hang off runs, so clear them first to avoid orphan rows.
-    $runids = $DB->get_fieldset_select('suddendeath_run', 'id', 'suddendeathid = ?', [$id]);
+    $runids = $DB->get_fieldset_select('onelife_run', 'id', 'onelifeid = ?', [$id]);
     if (!empty($runids)) {
         [$insql, $params] = $DB->get_in_or_equal($runids);
-        $DB->delete_records_select('suddendeath_answer', "runid {$insql}", $params);
+        $DB->delete_records_select('onelife_answer', "runid {$insql}", $params);
     }
-    $DB->delete_records('suddendeath_run', ['suddendeathid' => $id]);
-    $DB->delete_records('suddendeath', ['id' => $id]);
+    $DB->delete_records('onelife_run', ['onelifeid' => $id]);
+    $DB->delete_records('onelife', ['id' => $id]);
 
     return true;
 }
@@ -158,9 +158,9 @@ function suddendeath_delete_instance($id) {
  *
  * @param MoodleQuickForm $mform the course reset form
  */
-function suddendeath_reset_course_form_definition($mform) {
-    $mform->addElement('header', 'suddendeathheader', get_string('modulenameplural', 'mod_suddendeath'));
-    $mform->addElement('advcheckbox', 'reset_suddendeath_all', get_string('resetruns', 'mod_suddendeath'));
+function onelife_reset_course_form_definition($mform) {
+    $mform->addElement('header', 'onelifeheader', get_string('modulenameplural', 'mod_onelife'));
+    $mform->addElement('advcheckbox', 'reset_onelife_all', get_string('resetruns', 'mod_onelife'));
 }
 
 /**
@@ -172,12 +172,12 @@ function suddendeath_reset_course_form_definition($mform) {
  * @param stdClass $course the course being reset
  * @return array default values keyed by form element name
  */
-function suddendeath_reset_course_form_defaults($course) {
-    return ['reset_suddendeath_all' => 1];
+function onelife_reset_course_form_defaults($course) {
+    return ['reset_onelife_all' => 1];
 }
 
 /**
- * Remove learner data for every Sudden Death activity in a course.
+ * Remove learner data for every One Life activity in a course.
  *
  * Only acts when its own option was ticked. Course reset runs every component in
  * turn, so treating an absent setting as consent would destroy runs during a reset
@@ -186,14 +186,14 @@ function suddendeath_reset_course_form_defaults($course) {
  * @param stdClass $data the submitted reset form data, including courseid
  * @return array one status row per action taken, in the shape core's report expects
  */
-function suddendeath_reset_userdata($data) {
+function onelife_reset_userdata($data) {
     global $DB;
 
-    if (empty($data->reset_suddendeath_all)) {
+    if (empty($data->reset_onelife_all)) {
         return [];
     }
 
-    $instanceids = $DB->get_fieldset_select('suddendeath', 'id', 'course = ?', [$data->courseid]);
+    $instanceids = $DB->get_fieldset_select('onelife', 'id', 'course = ?', [$data->courseid]);
 
     if (!empty($instanceids)) {
         // Answers hang off runs, so clear them first to avoid orphan rows. Scoping the
@@ -201,18 +201,18 @@ function suddendeath_reset_userdata($data) {
         // answers out of it even if two courses ever shared a run id.
         [$insql, $params] = $DB->get_in_or_equal($instanceids);
         $DB->delete_records_select(
-            'suddendeath_answer',
-            "runid IN (SELECT id FROM {suddendeath_run} WHERE suddendeathid {$insql})",
+            'onelife_answer',
+            "runid IN (SELECT id FROM {onelife_run} WHERE onelifeid {$insql})",
             $params
         );
-        $DB->delete_records_select('suddendeath_run', "suddendeathid {$insql}", $params);
+        $DB->delete_records_select('onelife_run', "onelifeid {$insql}", $params);
     }
 
     // Reported whether or not anything was found, because "nothing to delete" is
     // still an answer to what the teacher asked for.
     return [[
-        'component' => get_string('modulenameplural', 'mod_suddendeath'),
-        'item' => get_string('runsdeleted', 'mod_suddendeath'),
+        'component' => get_string('modulenameplural', 'mod_onelife'),
+        'item' => get_string('runsdeleted', 'mod_onelife'),
         'error' => false,
     ]];
 }

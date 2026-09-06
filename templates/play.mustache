@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_suddendeath/play
+    @template mod_onelife/play
 
-    One question in a Sudden Death run.
+    One question in a One Life run.
 
     Each answer is its own submit button, so answering costs one click and needs no
     JavaScript. Buttons are real buttons, so they are reachable and operable from the
@@ -58,31 +58,31 @@
         ]
     }
 }}
-<div class="suddendeath-play">
+<div class="onelife-play">
 
-    <p class="suddendeath-play__streak" role="status">
-        {{#str}} streaksofar, mod_suddendeath, {{streak}} {{/str}}
+    <p class="onelife-play__streak" role="status">
+        {{#str}} streaksofar, mod_onelife, {{streak}} {{/str}}
     </p>
 
-    <form method="post" action="{{{config.wwwroot}}}/mod/suddendeath/play.php" class="suddendeath-play__form">
+    <form method="post" action="{{{config.wwwroot}}}/mod/onelife/play.php" class="onelife-play__form">
         <input type="hidden" name="id" value="{{cmid}}">
         <input type="hidden" name="questionid" value="{{questionid}}">
         <input type="hidden" name="sesskey" value="{{sesskey}}">
 
         {{! Question text lives outside the legend: format_text wraps it in block
             elements, and a legend may only contain phrasing content. }}
-        <div id="suddendeath-question-{{questionid}}" class="suddendeath-play__questiontext">
+        <div id="onelife-question-{{questionid}}" class="onelife-play__questiontext">
             {{{questiontext}}}
         </div>
 
-        <fieldset class="suddendeath-play__question">
-            <legend class="sr-only visually-hidden">{{#str}} chooseananswer, mod_suddendeath {{/str}}</legend>
+        <fieldset class="onelife-play__question">
+            <legend class="sr-only visually-hidden">{{#str}} chooseananswer, mod_onelife {{/str}}</legend>
 
-            <div class="suddendeath-play__answers">
+            <div class="onelife-play__answers">
                 {{#answers}}
                     <button type="submit" name="answerid" value="{{id}}"
-                            class="btn btn-outline-primary suddendeath-play__answer"
-                            aria-describedby="suddendeath-question-{{questionid}}">
+                            class="btn btn-outline-primary onelife-play__answer"
+                            aria-describedby="onelife-question-{{questionid}}">
                         {{text}}
                     </button>
                 {{/answers}}

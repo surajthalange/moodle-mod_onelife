@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_suddendeath/summary
+    @template mod_onelife/summary
 
-    The end of a Sudden Death run.
+    The end of a One Life run.
 
     A run that ended because the pool ran out is reported as such rather than as a
     loss, because the learner got nothing wrong.
@@ -56,35 +56,35 @@
         "sesskey": "abc123"
     }
 }}
-<div class="suddendeath-summary">
+<div class="onelife-summary">
 
-    <h3 class="suddendeath-summary__heading">{{#str}} runover, mod_suddendeath {{/str}}</h3>
+    <h3 class="onelife-summary__heading">{{#str}} runover, mod_onelife {{/str}}</h3>
 
-    <p class="suddendeath-summary__score" role="status">
-        {{#str}} finalstreak, mod_suddendeath, {{streak}} {{/str}}
-        <span class="suddendeath-summary__percent">{{percent}}%</span>
+    <p class="onelife-summary__score" role="status">
+        {{#str}} finalstreak, mod_onelife, {{streak}} {{/str}}
+        <span class="onelife-summary__percent">{{percent}}%</span>
     </p>
 
     {{#exhausted}}
-        <div class="alert alert-info suddendeath-summary__exhausted" role="alert">{{exhaustedmessage}}</div>
+        <div class="alert alert-info onelife-summary__exhausted" role="alert">{{exhaustedmessage}}</div>
     {{/exhausted}}
 
     {{^exhausted}}
         {{#hascorrectanswer}}
-            <p class="suddendeath-summary__correct">
-                {{#str}} thecorrectanswerwas, mod_suddendeath {{/str}}
+            <p class="onelife-summary__correct">
+                {{#str}} thecorrectanswerwas, mod_onelife {{/str}}
                 <strong>{{correctanswer}}</strong>
             </p>
         {{/hascorrectanswer}}
     {{/exhausted}}
 
     {{#hasexplanation}}
-        <div class="suddendeath-summary__explanation">{{{explanation}}}</div>
+        <div class="onelife-summary__explanation">{{{explanation}}}</div>
     {{/hasexplanation}}
 
-    <p class="suddendeath-summary__actions">
-        <a href="{{{config.wwwroot}}}/mod/suddendeath/view.php?id={{cmid}}" class="btn btn-primary">
-            {{#str}} backtoactivity, mod_suddendeath {{/str}}
+    <p class="onelife-summary__actions">
+        <a href="{{{config.wwwroot}}}/mod/onelife/view.php?id={{cmid}}" class="btn btn-primary">
+            {{#str}} backtoactivity, mod_onelife {{/str}}
         </a>
     </p>
 

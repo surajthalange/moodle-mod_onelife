@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for mod_suddendeath.
+ * Capability definitions for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
 
     // Adding an instance lets the teacher write an intro, which accepts HTML.
-    'mod/suddendeath:addinstance' => [
+    'mod/onelife:addinstance' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -39,7 +39,7 @@ $capabilities = [
     ],
 
     // Seeing the activity and its personal records. No risk: read only.
-    'mod/suddendeath:view' => [
+    'mod/onelife:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
@@ -52,7 +52,7 @@ $capabilities = [
     ],
 
     // Playing a run writes run and answer rows, so guests are excluded.
-    'mod/suddendeath:play' => [
+    'mod/onelife:play' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [

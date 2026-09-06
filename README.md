@@ -1,11 +1,11 @@
-# Sudden Death
+# One Life
 
-[![Moodle Plugin CI](https://github.com/surajthalange/moodle-mod_suddendeath/actions/workflows/ci.yml/badge.svg)](https://github.com/surajthalange/moodle-mod_suddendeath/actions/workflows/ci.yml)
+[![Moodle Plugin CI](https://github.com/surajthalange/moodle-mod_onelife/actions/workflows/ci.yml/badge.svg)](https://github.com/surajthalange/moodle-mod_onelife/actions/workflows/ci.yml)
 
 A Moodle activity module giving learners a self-directed, streak-based revision tool built
 from a course's question bank.
 
-- **Component:** `mod_suddendeath`
+- **Component:** `mod_onelife`
 - **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2
 - **Licence:** GPLv3 or later
 - **Status:** alpha, scaffold only — not yet playable
@@ -38,7 +38,7 @@ the feedback and everything above it will be hidden from the learner.
 ## Positioning against mod_game
 
 `mod_game` is a teacher-configured game activity: the teacher chooses the source and the
-learner plays what they are given. `mod_suddendeath` is a learner-driven revision tool: the
+learner plays what they are given. `mod_onelife` is a learner-driven revision tool: the
 learner chooses their own scope at play time, and the plugin tracks their personal bests
 across scopes over time.
 
@@ -60,7 +60,7 @@ There is one limitation worth knowing before you rely on it.
 course, so on restore each recorded answer is remapped onto the question it was actually about.
 Topic categories are remapped too. This is the normal case and it works.
 
-**Activity-level backups cannot.** A backup of the Sudden Death activity on its own does not
+**Activity-level backups cannot.** A backup of the One Life activity on its own does not
 include the question bank, so on restore there is no question to remap onto. Moodle's older
 `annotate_ids('question', ...)` mechanism, which used to bridge this, has not been functional
 since question versioning arrived: questions are pulled in through the question bank steps and
@@ -89,14 +89,14 @@ Moodle 5.1 and later moved the codebase under `public/` (MDL-83424), so the path
 version:
 
     # Moodle 5.1+
-    git clone https://github.com/surajthalange/moodle-mod_suddendeath.git \
-      <moodle>/public/mod/suddendeath
+    git clone https://github.com/surajthalange/moodle-mod_onelife.git \
+      <moodle>/public/mod/onelife
 
     # Moodle 4.5 - 5.0
-    git clone https://github.com/surajthalange/moodle-mod_suddendeath.git \
-      <moodle>/mod/suddendeath
+    git clone https://github.com/surajthalange/moodle-mod_onelife.git \
+      <moodle>/mod/onelife
 
-The directory must be named `suddendeath`, not the repository name.
+The directory must be named `onelife`, not the repository name.
 
 ## Development
 
@@ -112,4 +112,4 @@ Checks, from a `moodle-plugin-ci` installation:
 Unit tests, from the Moodle root:
 
     php public/admin/tool/phpunit/cli/init.php
-    php vendor/phpunit/phpunit/phpunit public/mod/suddendeath/tests/engine_test.php
+    php vendor/phpunit/phpunit/phpunit public/mod/onelife/tests/engine_test.php

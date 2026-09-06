@@ -17,17 +17,17 @@
 /**
  * The run lifecycle.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use context_module;
-use mod_suddendeath\engine;
-use mod_suddendeath\event\run_finished;
-use mod_suddendeath\event\run_started;
+use mod_onelife\engine;
+use mod_onelife\event\run_finished;
+use mod_onelife\event\run_started;
 use stdClass;
 
 /**
@@ -48,7 +48,7 @@ use stdClass;
  *
  * Finishing sets timefinish and clears currentquestionid together.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -68,17 +68,17 @@ class run_manager {
     /**
      * The learner's in-progress run for this instance, if there is one.
      *
-     * @param int $suddendeathid the instance id
+     * @param int $onelifeid the instance id
      * @param int $userid the learner
      * @return stdClass|null the run, or null when none is open
      */
-    public function get_in_progress_run(int $suddendeathid, int $userid): ?stdClass {
+    public function get_in_progress_run(int $onelifeid, int $userid): ?stdClass {
         global $DB;
 
         $run = $DB->get_record_select(
-            'suddendeath_run',
-            'suddendeathid = ? AND userid = ? AND timefinish IS NULL',
-            [$suddendeathid, $userid]
+            'onelife_run',
+            'onelifeid = ? AND userid = ? AND timefinish IS NULL',
+            [$onelifeid, $userid]
         );
 
         return $run ?: null;
@@ -113,7 +113,7 @@ class run_manager {
         }
 
         $run = new stdClass();
-        $run->suddendeathid = (int) $instance->id;
+        $run->onelifeid = (int) $instance->id;
         $run->userid = $userid;
         $run->scopetype = $scopetype;
         // Stored sorted and deduplicated, so two runs over the same set of topics
@@ -126,7 +126,7 @@ class run_manager {
         $run->currentquestionid = $firstquestionid;
         $run->timecreated = time();
         $run->timefinish = null;
-        $run->id = $DB->insert_record('suddendeath_run', $run);
+        $run->id = $DB->insert_record('onelife_run', $run);
 
         // Only this branch fires. Resuming returned above, so a refresh cannot make
         // the same run look like a second start in the logs.
@@ -184,7 +184,7 @@ class run_manager {
         global $DB;
 
         // Re-read: the run object came from a rendered page and may be stale.
-        $current = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $current = $DB->get_record('onelife_run', ['id' => $run->id]);
 
         $refusal = $this->refuse_submission($current, $userid, $questionid);
         if ($refusal !== null) {
@@ -250,7 +250,7 @@ class run_manager {
         // from a rendered page. Closing an already closed run must not fire a second
         // run_finished.
         $wasopen = $DB->record_exists_select(
-            'suddendeath_run',
+            'onelife_run',
             'id = ? AND timefinish IS NULL',
             [$run->id]
         );
@@ -259,7 +259,7 @@ class run_manager {
         $update->id = $run->id;
         $update->timefinish = time();
         $update->currentquestionid = null;
-        $DB->update_record('suddendeath_run', $update);
+        $DB->update_record('onelife_run', $update);
 
         $run->timefinish = $update->timefinish;
         $run->currentquestionid = null;
@@ -288,7 +288,7 @@ class run_manager {
         $answer->correct = $correct ? 1 : 0;
         $answer->timecreated = time();
 
-        $DB->insert_record('suddendeath_answer', $answer);
+        $DB->insert_record('onelife_answer', $answer);
     }
 
     /**
@@ -322,7 +322,7 @@ class run_manager {
             $update->currentquestionid = $nextquestionid;
         }
 
-        $DB->update_record('suddendeath_run', $update);
+        $DB->update_record('onelife_run', $update);
     }
 
     /**
@@ -335,7 +335,7 @@ class run_manager {
         global $DB;
 
         $topicids = array_filter(array_map('intval', explode(',', (string) $run->topicids)));
-        $answered = $DB->get_fieldset_select('suddendeath_answer', 'questionid', 'runid = ?', [$run->id]);
+        $answered = $DB->get_fieldset_select('onelife_answer', 'questionid', 'runid = ?', [$run->id]);
 
         $exclude = array_map('intval', $answered);
         if (!empty($run->currentquestionid)) {
@@ -354,7 +354,7 @@ class run_manager {
     protected function set_current_question(stdClass $run, int $questionid): void {
         global $DB;
 
-        $DB->set_field('suddendeath_run', 'currentquestionid', $questionid, ['id' => $run->id]);
+        $DB->set_field('onelife_run', 'currentquestionid', $questionid, ['id' => $run->id]);
         $run->currentquestionid = $questionid;
     }
 
@@ -468,7 +468,7 @@ class run_manager {
      * @return context_module|null the context, or null when there is no course module
      */
     protected function context_of(stdClass $run): ?context_module {
-        $cm = get_coursemodule_from_instance('suddendeath', (int) $run->suddendeathid, 0, false, IGNORE_MISSING);
+        $cm = get_coursemodule_from_instance('onelife', (int) $run->onelifeid, 0, false, IGNORE_MISSING);
 
         return $cm ? context_module::instance($cm->id) : null;
     }

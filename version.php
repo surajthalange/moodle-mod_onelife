@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version details for mod_suddendeath.
+ * Version details for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_suddendeath';
+$plugin->component = 'mod_onelife';
 $plugin->version = 2026090601;
 // Moodle 4.5 LTS is the supported floor (see PRD section 3). 4.1 is deliberately not supported.
 $plugin->requires = 2024100700;

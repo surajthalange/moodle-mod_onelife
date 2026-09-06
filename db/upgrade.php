@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Upgrade steps for mod_suddendeath.
+ * Upgrade steps for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Execute the mod_suddendeath upgrade steps from the given old version.
+ * Execute the mod_onelife upgrade steps from the given old version.
  *
  * The plugin has not been released, so there are no versions in the wild to
  * upgrade from and this function is intentionally empty. Savepoints will be
@@ -32,6 +32,6 @@
  * @param int $oldversion the version we are upgrading from
  * @return bool always true
  */
-function xmldb_suddendeath_upgrade($oldversion) {
+function xmldb_onelife_upgrade($oldversion) {
     return true;
 }

@@ -17,12 +17,12 @@
 /**
  * Scope modes and their form encoding.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 /**
  * The scope modes a teacher may permit, and how they cross the form boundary.
@@ -31,7 +31,7 @@ namespace mod_suddendeath\local;
  * Labels live in the language pack and a site may override them; the codes are the
  * on-disk contract and must not change.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -149,6 +149,6 @@ final class modes {
      * @return string the label
      */
     public static function label(string $code): string {
-        return get_string('mode_' . $code, 'mod_suddendeath');
+        return get_string('mode_' . $code, 'mod_onelife');
     }
 }

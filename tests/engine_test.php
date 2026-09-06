@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the mod_suddendeath scoring engine.
+ * Unit tests for the mod_onelife scoring engine.
  *
  * The engine is pure: no database, no output, no global state. These tests extend
  * basic_testcase rather than advanced_testcase precisely because basic_testcase
@@ -27,22 +27,22 @@
  * ships PHPUnit ^9.6.34. Converting to attributes would silently stop these tests
  * running on 4.5. Revisit only when the floor moves past Moodle 5.0.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 use stdClass;
 
 /**
  * Tests for the engine class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\engine
+ * @covers     \mod_onelife\engine
  */
 final class engine_test extends \basic_testcase {
     /**

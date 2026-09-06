@@ -1,26 +1,26 @@
-/* Styles for mod_suddendeath.
+/* Styles for mod_onelife.
  *
  * Self-contained: this file assumes no other plugin's stylesheet is loaded.
- * Every selector is scoped to this module's body id or to a suddendeath- prefixed
+ * Every selector is scoped to this module's body id or to a onelife- prefixed
  * class, so nothing here can leak into the rest of the site.
  *
  * Colours come from Moodle's theme custom properties with a plain fallback, so the
  * activity inherits the site theme instead of fighting it.
  */
 
-#page-mod-suddendeath-view .suddendeath-picker {
+#page-mod-onelife-view .onelife-picker {
     margin-bottom: 1.5rem;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker__title {
+#page-mod-onelife-view .onelife-picker__title {
     margin-bottom: 1rem;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker__warnings {
+#page-mod-onelife-view .onelife-picker__warnings {
     margin-bottom: 1rem;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker__notice {
+#page-mod-onelife-view .onelife-picker__notice {
     border-left: 4px solid var(--primary, #0f6cbf);
 }
 
@@ -32,24 +32,24 @@
  * first row's content sat centred while the rows themselves were never indented.
  * Declaring it here means an inherited rule cannot reintroduce that.
  */
-#page-mod-suddendeath-view .suddendeath-picker .fitem .felement > div,
-#page-mod-suddendeath-view .suddendeath-picker__row {
+#page-mod-onelife-view .onelife-picker .fitem .felement > div,
+#page-mod-onelife-view .onelife-picker__row {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: baseline;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker .fitem .felement > div:first-child,
-#page-mod-suddendeath-view .suddendeath-picker__row:first-child {
+#page-mod-onelife-view .onelife-picker .fitem .felement > div:first-child,
+#page-mod-onelife-view .onelife-picker__row:first-child {
     justify-content: flex-start;
 }
 
 /* Give radio and checkbox labels a comfortable target without changing their
  * semantics: these stay real labels tied to real inputs.
  */
-#page-mod-suddendeath-view .suddendeath-picker .form-check-inline,
-#page-mod-suddendeath-view .suddendeath-picker label {
+#page-mod-onelife-view .onelife-picker .form-check-inline,
+#page-mod-onelife-view .onelife-picker label {
     margin-bottom: 0.35rem;
     line-height: 1.5;
 }
@@ -57,19 +57,19 @@
 /* Keep the keyboard focus ring visible. Removing outlines is the single most
  * common way a picker like this becomes unusable without a mouse.
  */
-#page-mod-suddendeath-view .suddendeath-picker input:focus-visible,
-#page-mod-suddendeath-view .suddendeath-picker button:focus-visible {
+#page-mod-onelife-view .onelife-picker input:focus-visible,
+#page-mod-onelife-view .onelife-picker button:focus-visible {
     outline: 2px solid var(--primary, #0f6cbf);
     outline-offset: 2px;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker fieldset {
+#page-mod-onelife-view .onelife-picker fieldset {
     border: 0;
     margin: 0 0 1rem;
     padding: 0;
 }
 
-#page-mod-suddendeath-view .suddendeath-picker legend {
+#page-mod-onelife-view .onelife-picker legend {
     font-size: 1rem;
     font-weight: 600;
     width: auto;

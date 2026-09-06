@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Custom completion rules for mod_suddendeath.
+ * Custom completion rules for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\completion;
+namespace mod_onelife\completion;
 
 use core_completion\activity_custom_completion;
 
@@ -36,7 +36,7 @@ use core_completion\activity_custom_completion;
  * not what their current standing is. Completion is an achievement, so a poor run
  * afterwards does not take it back.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -52,7 +52,7 @@ class custom_completion extends activity_custom_completion {
 
         $this->validate_rule($rule);
 
-        $required = (int) $DB->get_field('suddendeath', 'completionstreak', ['id' => $this->cm->instance]);
+        $required = (int) $DB->get_field('onelife', 'completionstreak', ['id' => $this->cm->instance]);
 
         // Zero, or blank, means the teacher did not ask for a streak requirement, so
         // this rule can never be what completes the activity.
@@ -63,8 +63,8 @@ class custom_completion extends activity_custom_completion {
         // Only finished runs count. An open run would let a learner be marked complete
         // while sitting on a streak they have not yet survived.
         $met = $DB->record_exists_select(
-            'suddendeath_run',
-            'suddendeathid = :instanceid
+            'onelife_run',
+            'onelifeid = :instanceid
                  AND userid = :userid
                  AND timefinish IS NOT NULL
                  AND streak >= :required',
@@ -95,10 +95,10 @@ class custom_completion extends activity_custom_completion {
     public function get_custom_rule_descriptions(): array {
         global $DB;
 
-        $required = (int) $DB->get_field('suddendeath', 'completionstreak', ['id' => $this->cm->instance]);
+        $required = (int) $DB->get_field('onelife', 'completionstreak', ['id' => $this->cm->instance]);
 
         return [
-            'completionstreak' => get_string('completiondetail:streak', 'mod_suddendeath', $required),
+            'completionstreak' => get_string('completiondetail:streak', 'mod_onelife', $required),
         ];
     }
 

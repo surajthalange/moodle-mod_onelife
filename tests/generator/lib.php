@@ -15,23 +15,23 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Test data generator for mod_suddendeath.
+ * Test data generator for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Creates Sudden Death instances for tests.
+ * Creates One Life instances for tests.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_suddendeath_generator extends testing_module_generator {
+class mod_onelife_generator extends testing_module_generator {
     /**
-     * Create a Sudden Death instance.
+     * Create a One Life instance.
      *
      * @param array|stdClass|null $record the instance fields
      * @param array|null $options generator options

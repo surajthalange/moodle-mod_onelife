@@ -17,14 +17,14 @@
 /**
  * Renderable for the end of a run.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
-use mod_suddendeath\engine;
+use mod_onelife\engine;
 use renderer_base;
 use renderable;
 use stdClass;
@@ -37,7 +37,7 @@ use templatable;
  * learner did not get anything wrong, and saying otherwise would be a lie about
  * their score.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -90,7 +90,7 @@ class summary_page implements renderable, templatable {
      * Build the template context.
      *
      * @param renderer_base $output the renderer
-     * @return stdClass the context for mod_suddendeath/summary
+     * @return stdClass the context for mod_onelife/summary
      */
     public function export_for_template(renderer_base $output): stdClass {
         $context = new stdClass();
@@ -104,7 +104,7 @@ class summary_page implements renderable, templatable {
         $context->hasexplanation = trim(strip_tags($this->explanation)) !== '';
         $context->exhausted = $this->exhausted;
         $context->exhaustedmessage = $this->exhausted
-            ? get_string('poolexhausted', 'mod_suddendeath')
+            ? get_string('poolexhausted', 'mod_onelife')
             : '';
         $context->sesskey = sesskey();
 

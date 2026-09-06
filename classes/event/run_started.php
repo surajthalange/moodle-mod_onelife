@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The mod_suddendeath run started event.
+ * The mod_onelife run started event.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\event;
+namespace mod_onelife\event;
 
 /**
  * Fired when a learner starts a new run.
@@ -36,7 +36,7 @@ namespace mod_suddendeath\event;
  * are about to be asked. Event data is broadly readable, so anything naming a
  * question would leak what is in play to anyone with report access.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -47,7 +47,7 @@ class run_started extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'suddendeath_run';
+        $this->data['objecttable'] = 'onelife_run';
     }
 
     /**
@@ -56,7 +56,7 @@ class run_started extends \core\event\base {
      * @return string the translated name
      */
     public static function get_name() {
-        return get_string('eventrunstarted', 'mod_suddendeath');
+        return get_string('eventrunstarted', 'mod_onelife');
     }
 
     /**
@@ -66,7 +66,7 @@ class run_started extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '{$this->userid}' started run with id '{$this->objectid}' " .
-            "in the suddendeath activity with course module id '{$this->contextinstanceid}'.";
+            "in the onelife activity with course module id '{$this->contextinstanceid}'.";
     }
 
     /**
@@ -75,7 +75,7 @@ class run_started extends \core\event\base {
      * @return \moodle_url the activity url
      */
     public function get_url() {
-        return new \moodle_url('/mod/suddendeath/view.php', ['id' => $this->contextinstanceid]);
+        return new \moodle_url('/mod/onelife/view.php', ['id' => $this->contextinstanceid]);
     }
 
     /**
@@ -101,7 +101,7 @@ class run_started extends \core\event\base {
      */
     public static function get_objectid_mapping() {
         // Runs are restored under their own mapping, set by the restore step.
-        return ['db' => 'suddendeath_run', 'restore' => 'suddendeath_run'];
+        return ['db' => 'onelife_run', 'restore' => 'onelife_run'];
     }
 
     /**

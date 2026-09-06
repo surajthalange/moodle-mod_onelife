@@ -24,12 +24,12 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use context_course;
 use context_module;
@@ -38,10 +38,10 @@ use stdClass;
 /**
  * Tests for the run_manager class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\local\run_manager
+ * @covers     \mod_onelife\local\run_manager
  */
 final class run_manager_test extends \advanced_testcase {
     /** @var stdClass The activity instance under test. */
@@ -85,7 +85,7 @@ final class run_manager_test extends \advanced_testcase {
             $generator->create_question('multichoice', 'one_of_four', ['category' => $topic->id]);
         }
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', [
+        $this->instance = $this->getDataGenerator()->create_module('onelife', [
             'course' => $course->id,
             'targetstreak' => 15,
             'allowedmodes' => 'single,multi,all',
@@ -152,7 +152,7 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertSame((int) $first->id, (int) $second->id);
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id, 'userid' => $this->userid]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id, 'userid' => $this->userid]),
             'A second in-progress run must never be created.'
         );
     }
@@ -245,12 +245,12 @@ final class run_manager_test extends \advanced_testcase {
 
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_answer', ['runid' => $run->id]),
+            $DB->count_records('onelife_answer', ['runid' => $run->id]),
             'The answer must already be recorded when the streak update is reached.'
         );
         $this->assertSame(
             0,
-            (int) $DB->get_field('suddendeath_run', 'streak', ['id' => $run->id]),
+            (int) $DB->get_field('onelife_run', 'streak', ['id' => $run->id]),
             'The streak must not move until after the answer is recorded.'
         );
     }
@@ -272,7 +272,7 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertTrue($result->correct);
         $this->assertSame(1, $result->streak);
         $this->assertFalse($result->finished);
-        $this->assertSame(1, $DB->count_records('suddendeath_answer', ['runid' => $run->id, 'correct' => 1]));
+        $this->assertSame(1, $DB->count_records('onelife_answer', ['runid' => $run->id, 'correct' => 1]));
     }
 
     /**
@@ -304,7 +304,7 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertSame(2, $result->streak, 'The reported score must be the streak reached.');
         $this->assertSame(
             2,
-            (int) $DB->get_field('suddendeath_run', 'streak', ['id' => $run->id]),
+            (int) $DB->get_field('onelife_run', 'streak', ['id' => $run->id]),
             'The stored score must be the streak reached, not zero.'
         );
     }
@@ -326,7 +326,7 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertFalse($result->correct);
         $this->assertTrue($result->finished);
 
-        $stored = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $stored = $DB->get_record('onelife_run', ['id' => $run->id]);
         $this->assertNotNull($stored->timefinish);
         $this->assertNull($stored->currentquestionid);
     }
@@ -346,7 +346,7 @@ final class run_manager_test extends \advanced_testcase {
 
         (new run_manager())->finish($run);
 
-        $stored = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $stored = $DB->get_record('onelife_run', ['id' => $run->id]);
         $this->assertNotEmpty($stored->timefinish);
         $this->assertNull($stored->currentquestionid);
     }
@@ -377,8 +377,8 @@ final class run_manager_test extends \advanced_testcase {
         $result = (new run_manager())->answer($run, $this->userid, $questionid, $foreignanswer);
 
         $this->assertFalse($result->accepted);
-        $this->assertSame(0, $DB->count_records('suddendeath_answer', ['runid' => $run->id]));
-        $this->assertSame(0, (int) $DB->get_field('suddendeath_run', 'streak', ['id' => $run->id]));
+        $this->assertSame(0, $DB->count_records('onelife_answer', ['runid' => $run->id]));
+        $this->assertSame(0, (int) $DB->get_field('onelife_run', 'streak', ['id' => $run->id]));
     }
 
     /**
@@ -393,12 +393,12 @@ final class run_manager_test extends \advanced_testcase {
         $questionid = (int) $run->currentquestionid;
         (new run_manager())->finish($run);
 
-        $reloaded = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $reloaded = $DB->get_record('onelife_run', ['id' => $run->id]);
         $result = (new run_manager())->answer($reloaded, $this->userid, $questionid, $this->correct_answer_id($questionid));
 
         $this->assertFalse($result->accepted);
         $this->assertSame('finished', $result->reason);
-        $this->assertSame(0, $DB->count_records('suddendeath_answer', ['runid' => $run->id]));
+        $this->assertSame(0, $DB->count_records('onelife_answer', ['runid' => $run->id]));
     }
 
     /**
@@ -417,7 +417,7 @@ final class run_manager_test extends \advanced_testcase {
 
         $this->assertFalse($result->accepted);
         $this->assertSame('notyours', $result->reason);
-        $this->assertSame(0, $DB->count_records('suddendeath_answer', ['runid' => $run->id]));
+        $this->assertSame(0, $DB->count_records('onelife_answer', ['runid' => $run->id]));
     }
 
     /**
@@ -438,7 +438,7 @@ final class run_manager_test extends \advanced_testcase {
 
         $this->assertFalse($result->accepted);
         $this->assertSame('stale', $result->reason);
-        $this->assertSame(0, $DB->count_records('suddendeath_answer', ['runid' => $run->id]));
+        $this->assertSame(0, $DB->count_records('onelife_answer', ['runid' => $run->id]));
     }
 
     /**
@@ -467,8 +467,8 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertTrue($first->accepted);
         $this->assertFalse($second->accepted);
         $this->assertSame('stale', $second->reason);
-        $this->assertSame(1, $DB->count_records('suddendeath_answer', ['runid' => $run->id]));
-        $this->assertSame(1, (int) $DB->get_field('suddendeath_run', 'streak', ['id' => $run->id]));
+        $this->assertSame(1, $DB->count_records('onelife_answer', ['runid' => $run->id]));
+        $this->assertSame(1, (int) $DB->get_field('onelife_run', 'streak', ['id' => $run->id]));
     }
 
     /**
@@ -487,11 +487,11 @@ final class run_manager_test extends \advanced_testcase {
         $DB->delete_records('question', ['id' => $questionid]);
 
         $manager = new run_manager();
-        $current = $manager->get_current_question($DB->get_record('suddendeath_run', ['id' => $run->id]));
+        $current = $manager->get_current_question($DB->get_record('onelife_run', ['id' => $run->id]));
 
         // Either a replacement question is served or the run ends cleanly, but the
         // learner never sees a crash.
-        $stored = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $stored = $DB->get_record('onelife_run', ['id' => $run->id]);
         if ($current === null) {
             $this->assertNotEmpty($stored->timefinish, 'With no question to serve the run must be closed.');
         } else {
@@ -519,7 +519,7 @@ final class run_manager_test extends \advanced_testcase {
         $this->assertTrue($result->exhausted);
         $this->assertSame(1, $result->streak, 'The last correct answer still counts.');
 
-        $stored = $DB->get_record('suddendeath_run', ['id' => $run->id]);
+        $stored = $DB->get_record('onelife_run', ['id' => $run->id]);
         $this->assertNotEmpty($stored->timefinish);
         $this->assertNull($stored->currentquestionid);
     }
@@ -563,6 +563,6 @@ final class run_manager_test extends \advanced_testcase {
         $run = $this->start();
 
         $this->assertNull($run, 'An unplayable run should not be recorded.');
-        $this->assertSame(0, $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id]));
+        $this->assertSame(0, $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id]));
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/suddendeath/db" VERSION="20260906" COMMENT="XMLDB file for Moodle mod_suddendeath"
+<XMLDB PATH="mod/onelife/db" VERSION="20260906" COMMENT="XMLDB file for Moodle mod_onelife"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="suddendeath" COMMENT="Sudden Death activity instances">
+    <TABLE NAME="onelife" COMMENT="One Life activity instances">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to course.id"/>
@@ -23,10 +23,10 @@
         <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="suddendeath_run" COMMENT="One play-through of a Sudden Death activity">
+    <TABLE NAME="onelife_run" COMMENT="One play-through of a One Life activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="suddendeathid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to suddendeath.id"/>
+        <FIELD NAME="onelifeid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to onelife.id"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to user.id"/>
         <FIELD NAME="scopetype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="single, multi or all"/>
         <FIELD NAME="topicids" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated question category ids in play"/>
@@ -38,17 +38,17 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="suddendeathid" TYPE="foreign" FIELDS="suddendeathid" REFTABLE="suddendeath" REFFIELDS="id"/>
+        <KEY NAME="onelifeid" TYPE="foreign" FIELDS="onelifeid" REFTABLE="onelife" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="suddendeathid-userid" UNIQUE="false" FIELDS="suddendeathid, userid"/>
+        <INDEX NAME="onelifeid-userid" UNIQUE="false" FIELDS="onelifeid, userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="suddendeath_answer" COMMENT="One answered question within a run">
+    <TABLE NAME="onelife_answer" COMMENT="One answered question within a run">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="runid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to suddendeath_run.id"/>
+        <FIELD NAME="runid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to onelife_run.id"/>
         <FIELD NAME="topicid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question category the question came from"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK to question.id"/>
         <FIELD NAME="correct" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -56,7 +56,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="runid" TYPE="foreign" FIELDS="runid" REFTABLE="suddendeath_run" REFFIELDS="id"/>
+        <KEY NAME="runid" TYPE="foreign" FIELDS="runid" REFTABLE="onelife_run" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

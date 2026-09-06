@@ -25,20 +25,20 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 /**
  * Tests that the backup declaration matches the files on disk.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     ::suddendeath_supports
+ * @covers     ::onelife_supports
  */
 final class backup_classes_test extends \advanced_testcase {
     /**
@@ -47,16 +47,16 @@ final class backup_classes_test extends \advanced_testcase {
     public function test_backup_is_declared_supported(): void {
         global $CFG;
 
-        require_once($CFG->dirroot . '/mod/suddendeath/lib.php');
+        require_once($CFG->dirroot . '/mod/onelife/lib.php');
 
-        $this->assertTrue(suddendeath_supports(FEATURE_BACKUP_MOODLE2));
+        $this->assertTrue(onelife_supports(FEATURE_BACKUP_MOODLE2));
     }
 
     /**
      * All four backup and restore classes exist and load.
      *
      * Declaring support without these makes course-module deletion throw
-     * "Class backup_suddendeath_activity_task not found", which is a failure a
+     * "Class backup_onelife_activity_task not found", which is a failure a
      * teacher hits while tidying a course rather than while backing one up.
      */
     public function test_the_four_backup_classes_load(): void {
@@ -72,13 +72,13 @@ final class backup_classes_test extends \advanced_testcase {
         require_once($CFG->dirroot . '/backup/moodle2/backup_plan_builder.class.php');
         require_once($CFG->dirroot . '/backup/moodle2/restore_plan_builder.class.php');
 
-        $base = $CFG->dirroot . '/mod/suddendeath/backup/moodle2/';
+        $base = $CFG->dirroot . '/mod/onelife/backup/moodle2/';
 
         $files = [
-            'backup_suddendeath_activity_task.class.php' => 'backup_suddendeath_activity_task',
-            'backup_suddendeath_stepslib.php' => 'backup_suddendeath_activity_structure_step',
-            'restore_suddendeath_activity_task.class.php' => 'restore_suddendeath_activity_task',
-            'restore_suddendeath_stepslib.php' => 'restore_suddendeath_activity_structure_step',
+            'backup_onelife_activity_task.class.php' => 'backup_onelife_activity_task',
+            'backup_onelife_stepslib.php' => 'backup_onelife_activity_structure_step',
+            'restore_onelife_activity_task.class.php' => 'restore_onelife_activity_task',
+            'restore_onelife_stepslib.php' => 'restore_onelife_activity_structure_step',
         ];
 
         foreach ($files as $file => $class) {
@@ -98,12 +98,12 @@ final class backup_classes_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $instance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $course->id]);
-        $cm = get_coursemodule_from_instance('suddendeath', $instance->id, $course->id, false, MUST_EXIST);
+        $instance = $this->getDataGenerator()->create_module('onelife', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('onelife', $instance->id, $course->id, false, MUST_EXIST);
 
         course_delete_module($cm->id);
 
-        $this->assertFalse($DB->record_exists('suddendeath', ['id' => $instance->id]));
+        $this->assertFalse($DB->record_exists('onelife', ['id' => $instance->id]));
         $this->assertFalse($DB->record_exists('course_modules', ['id' => $cm->id]));
     }
 }

@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Backup task for mod_suddendeath.
+ * Backup task for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/suddendeath/backup/moodle2/backup_suddendeath_stepslib.php');
+require_once($CFG->dirroot . '/mod/onelife/backup/moodle2/backup_onelife_stepslib.php');
 
 /**
- * Backs up a Sudden Death activity.
+ * Backs up a One Life activity.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_suddendeath_activity_task extends backup_activity_task {
+class backup_onelife_activity_task extends backup_activity_task {
     /**
      * The activity has no backup settings of its own.
      */
@@ -41,10 +41,10 @@ class backup_suddendeath_activity_task extends backup_activity_task {
     }
 
     /**
-     * Add the structure step that writes suddendeath.xml.
+     * Add the structure step that writes onelife.xml.
      */
     protected function define_my_steps() {
-        $this->add_step(new backup_suddendeath_activity_structure_step('suddendeath_structure', 'suddendeath.xml'));
+        $this->add_step(new backup_onelife_activity_structure_step('onelife_structure', 'onelife.xml'));
     }
 
     /**
@@ -58,11 +58,11 @@ class backup_suddendeath_activity_task extends backup_activity_task {
 
         $base = preg_quote($CFG->wwwroot, '/');
 
-        $search = "/({$base}\/mod\/suddendeath\/index.php\?id\=)([0-9]+)/";
-        $content = preg_replace($search, '$@SUDDENDEATHINDEX*$2@$', $content);
+        $search = "/({$base}\/mod\/onelife\/index.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@ONELIFEINDEX*$2@$', $content);
 
-        $search = "/({$base}\/mod\/suddendeath\/view.php\?id\=)([0-9]+)/";
-        $content = preg_replace($search, '$@SUDDENDEATHVIEWBYID*$2@$', $content);
+        $search = "/({$base}\/mod\/onelife\/view.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@ONELIFEVIEWBYID*$2@$', $content);
 
         return $content;
     }

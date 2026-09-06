@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider for mod_suddendeath.
+ * Privacy provider for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\privacy;
+namespace mod_onelife\privacy;
 
 use context;
 use context_module;
@@ -36,7 +36,7 @@ use core_privacy\local\request\writer;
 use stdClass;
 
 /**
- * Handles subject access requests for Sudden Death.
+ * Handles subject access requests for One Life.
  *
  * The plugin records who played, when, what they chose and how each answer went, so
  * this is a full provider rather than a null one. Every field in both tables is
@@ -47,7 +47,7 @@ use stdClass;
  * they are. Every delete therefore resolves runs first and removes their answers
  * with them, so no answer is ever orphaned from the person it describes.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -63,38 +63,38 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
-            'suddendeath_run',
+            'onelife_run',
             [
-                'suddendeathid' => 'privacy:metadata:suddendeath_run:suddendeathid',
-                'userid' => 'privacy:metadata:suddendeath_run:userid',
-                'scopetype' => 'privacy:metadata:suddendeath_run:scopetype',
-                'topicids' => 'privacy:metadata:suddendeath_run:topicids',
-                'streak' => 'privacy:metadata:suddendeath_run:streak',
-                'targetstreak' => 'privacy:metadata:suddendeath_run:targetstreak',
-                'currentquestionid' => 'privacy:metadata:suddendeath_run:currentquestionid',
-                'timecreated' => 'privacy:metadata:suddendeath_run:timecreated',
-                'timefinish' => 'privacy:metadata:suddendeath_run:timefinish',
+                'onelifeid' => 'privacy:metadata:onelife_run:onelifeid',
+                'userid' => 'privacy:metadata:onelife_run:userid',
+                'scopetype' => 'privacy:metadata:onelife_run:scopetype',
+                'topicids' => 'privacy:metadata:onelife_run:topicids',
+                'streak' => 'privacy:metadata:onelife_run:streak',
+                'targetstreak' => 'privacy:metadata:onelife_run:targetstreak',
+                'currentquestionid' => 'privacy:metadata:onelife_run:currentquestionid',
+                'timecreated' => 'privacy:metadata:onelife_run:timecreated',
+                'timefinish' => 'privacy:metadata:onelife_run:timefinish',
             ],
-            'privacy:metadata:suddendeath_run'
+            'privacy:metadata:onelife_run'
         );
 
         $collection->add_database_table(
-            'suddendeath_answer',
+            'onelife_answer',
             [
-                'runid' => 'privacy:metadata:suddendeath_answer:runid',
-                'topicid' => 'privacy:metadata:suddendeath_answer:topicid',
-                'questionid' => 'privacy:metadata:suddendeath_answer:questionid',
-                'correct' => 'privacy:metadata:suddendeath_answer:correct',
-                'timecreated' => 'privacy:metadata:suddendeath_answer:timecreated',
+                'runid' => 'privacy:metadata:onelife_answer:runid',
+                'topicid' => 'privacy:metadata:onelife_answer:topicid',
+                'questionid' => 'privacy:metadata:onelife_answer:questionid',
+                'correct' => 'privacy:metadata:onelife_answer:correct',
+                'timecreated' => 'privacy:metadata:onelife_answer:timecreated',
             ],
-            'privacy:metadata:suddendeath_answer'
+            'privacy:metadata:onelife_answer'
         );
 
         return $collection;
     }
 
     /**
-     * The contexts where a person has Sudden Death data.
+     * The contexts where a person has One Life data.
      *
      * @param int $userid the person
      * @return contextlist the contexts
@@ -103,15 +103,15 @@ class provider implements
         $contextlist = new contextlist();
 
         $sql = "SELECT ctx.id
-                  FROM {suddendeath_run} r
-                  JOIN {suddendeath} s ON s.id = r.suddendeathid
+                  FROM {onelife_run} r
+                  JOIN {onelife} s ON s.id = r.onelifeid
                   JOIN {course_modules} cm ON cm.instance = s.id
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                   JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextlevel
                  WHERE r.userid = :userid";
 
         $contextlist->add_from_sql($sql, [
-            'modname' => 'suddendeath',
+            'modname' => 'onelife',
             'contextlevel' => CONTEXT_MODULE,
             'userid' => $userid,
         ]);
@@ -132,14 +132,14 @@ class provider implements
         }
 
         $sql = "SELECT r.userid
-                  FROM {suddendeath_run} r
-                  JOIN {suddendeath} s ON s.id = r.suddendeathid
+                  FROM {onelife_run} r
+                  JOIN {onelife} s ON s.id = r.onelifeid
                   JOIN {course_modules} cm ON cm.instance = s.id
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                  WHERE cm.id = :cmid";
 
         $userlist->add_from_sql('userid', $sql, [
-            'modname' => 'suddendeath',
+            'modname' => 'onelife',
             'cmid' => $context->instanceid,
         ]);
     }
@@ -159,14 +159,14 @@ class provider implements
                 continue;
             }
 
-            $cm = get_coursemodule_from_id('suddendeath', $context->instanceid, 0, false, IGNORE_MISSING);
+            $cm = get_coursemodule_from_id('onelife', $context->instanceid, 0, false, IGNORE_MISSING);
             if (!$cm) {
                 continue;
             }
 
             $runs = $DB->get_records(
-                'suddendeath_run',
-                ['suddendeathid' => $cm->instance, 'userid' => $userid],
+                'onelife_run',
+                ['onelifeid' => $cm->instance, 'userid' => $userid],
                 'timecreated ASC'
             );
 
@@ -176,7 +176,7 @@ class provider implements
 
             $export = [];
             foreach ($runs as $run) {
-                $answers = $DB->get_records('suddendeath_answer', ['runid' => $run->id], 'timecreated ASC');
+                $answers = $DB->get_records('onelife_answer', ['runid' => $run->id], 'timecreated ASC');
 
                 $export[] = [
                     'scopetype' => $run->scopetype,
@@ -197,7 +197,7 @@ class provider implements
             }
 
             writer::with_context($context)->export_data(
-                [get_string('privacy:path:runs', 'mod_suddendeath')],
+                [get_string('privacy:path:runs', 'mod_onelife')],
                 (object) ['runs' => $export]
             );
         }
@@ -215,15 +215,15 @@ class provider implements
             return;
         }
 
-        $cm = get_coursemodule_from_id('suddendeath', $context->instanceid, 0, false, IGNORE_MISSING);
+        $cm = get_coursemodule_from_id('onelife', $context->instanceid, 0, false, IGNORE_MISSING);
         if (!$cm) {
             return;
         }
 
         self::delete_runs_matching($DB->get_fieldset_select(
-            'suddendeath_run',
+            'onelife_run',
             'id',
-            'suddendeathid = ?',
+            'onelifeid = ?',
             [$cm->instance]
         ));
     }
@@ -243,15 +243,15 @@ class provider implements
                 continue;
             }
 
-            $cm = get_coursemodule_from_id('suddendeath', $context->instanceid, 0, false, IGNORE_MISSING);
+            $cm = get_coursemodule_from_id('onelife', $context->instanceid, 0, false, IGNORE_MISSING);
             if (!$cm) {
                 continue;
             }
 
             self::delete_runs_matching($DB->get_fieldset_select(
-                'suddendeath_run',
+                'onelife_run',
                 'id',
-                'suddendeathid = ? AND userid = ?',
+                'onelifeid = ? AND userid = ?',
                 [$cm->instance, $userid]
             ));
         }
@@ -271,7 +271,7 @@ class provider implements
             return;
         }
 
-        $cm = get_coursemodule_from_id('suddendeath', $context->instanceid, 0, false, IGNORE_MISSING);
+        $cm = get_coursemodule_from_id('onelife', $context->instanceid, 0, false, IGNORE_MISSING);
         if (!$cm) {
             return;
         }
@@ -285,9 +285,9 @@ class provider implements
         $params['instanceid'] = $cm->instance;
 
         self::delete_runs_matching($DB->get_fieldset_select(
-            'suddendeath_run',
+            'onelife_run',
             'id',
-            "suddendeathid = :instanceid AND userid {$insql}",
+            "onelifeid = :instanceid AND userid {$insql}",
             $params
         ));
     }
@@ -309,7 +309,7 @@ class provider implements
 
         [$insql, $params] = $DB->get_in_or_equal(array_map('intval', $runids));
 
-        $DB->delete_records_select('suddendeath_answer', "runid {$insql}", $params);
-        $DB->delete_records_select('suddendeath_run', "id {$insql}", $params);
+        $DB->delete_records_select('onelife_answer', "runid {$insql}", $params);
+        $DB->delete_records_select('onelife_run', "id {$insql}", $params);
     }
 }

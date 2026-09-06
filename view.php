@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Displays the scope picker for a Sudden Death activity.
+ * Displays the scope picker for a One Life activity.
  *
  * A thin controller: it resolves the module, checks access, asks the repository for
  * topics, hands them to a renderable and renders. No business logic, no direct
  * database queries and no inline HTML live here.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,44 +29,44 @@
 require('../../config.php');
 require_once($CFG->libdir . '/completionlib.php');
 
-use mod_suddendeath\form\scope_picker_form;
-use mod_suddendeath\local\modes;
-use mod_suddendeath\local\run_manager;
-use mod_suddendeath\local\scope_validator;
-use mod_suddendeath\local\stats_repository;
-use mod_suddendeath\output\picker_page;
-use mod_suddendeath\topic_repository;
+use mod_onelife\form\scope_picker_form;
+use mod_onelife\local\modes;
+use mod_onelife\local\run_manager;
+use mod_onelife\local\scope_validator;
+use mod_onelife\local\stats_repository;
+use mod_onelife\output\picker_page;
+use mod_onelife\topic_repository;
 
 $id = optional_param('id', 0, PARAM_INT);
 $s = optional_param('s', 0, PARAM_INT);
 
 if ($id) {
-    $cm = get_coursemodule_from_id('suddendeath', $id, 0, false, MUST_EXIST);
+    $cm = get_coursemodule_from_id('onelife', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-    $moduleinstance = $DB->get_record('suddendeath', ['id' => $cm->instance], '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('onelife', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $moduleinstance = $DB->get_record('suddendeath', ['id' => $s], '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('onelife', ['id' => $s], '*', MUST_EXIST);
     $course = $DB->get_record('course', ['id' => $moduleinstance->course], '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('suddendeath', $moduleinstance->id, $course->id, false, MUST_EXIST);
+    $cm = get_coursemodule_from_instance('onelife', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
 
 require_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
-require_capability('mod/suddendeath:view', $context);
+require_capability('mod/onelife:view', $context);
 
-$event = \mod_suddendeath\event\course_module_viewed::create([
+$event = \mod_onelife\event\course_module_viewed::create([
     'objectid' => $moduleinstance->id,
     'context' => $context,
 ]);
 $event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('suddendeath', $moduleinstance);
+$event->add_record_snapshot('onelife', $moduleinstance);
 $event->trigger();
 
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-$PAGE->set_url('/mod/suddendeath/view.php', ['id' => $cm->id]);
+$PAGE->set_url('/mod/onelife/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 $PAGE->set_cm($cm, $course, $moduleinstance);
 $PAGE->set_title(format_string($moduleinstance->name));
@@ -89,7 +89,7 @@ if ($playable) {
     ]);
 
     if ($submitted = $form->get_data()) {
-        require_capability('mod/suddendeath:play', $context);
+        require_capability('mod/onelife:play', $context);
 
         $scopetype = (string) $submitted->scopetype;
         if ($scopetype === modes::ALL) {
@@ -108,10 +108,10 @@ if ($playable) {
         );
 
         if ($run !== null) {
-            redirect(new moodle_url('/mod/suddendeath/play.php', ['id' => $cm->id]));
+            redirect(new moodle_url('/mod/onelife/play.php', ['id' => $cm->id]));
         }
 
-        $warnings[] = get_string('errnotopicsinbank', 'mod_suddendeath');
+        $warnings[] = get_string('errnotopicsinbank', 'mod_onelife');
     }
 
     $formhtml = $form->render();
@@ -119,16 +119,16 @@ if ($playable) {
 
 $records = (new stats_repository())->get_records((int) $moduleinstance->id, (int) $USER->id);
 
-$output = $PAGE->get_renderer('mod_suddendeath');
+$output = $PAGE->get_renderer('mod_onelife');
 $page = new picker_page($moduleinstance, $topics, $bank !== null, $formhtml, $warnings, $records);
 
 echo $OUTPUT->header();
 
 if (trim(strip_tags($moduleinstance->intro))) {
     echo $OUTPUT->box(
-        format_module_intro('suddendeath', $moduleinstance, $cm->id),
+        format_module_intro('onelife', $moduleinstance, $cm->id),
         'generalbox mod_introbox',
-        'suddendeathintro'
+        'onelifeintro'
     );
 }
 

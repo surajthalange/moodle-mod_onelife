@@ -24,28 +24,28 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\event;
+namespace mod_onelife\event;
 
 use context_course;
 use context_module;
-use mod_suddendeath\local\modes;
-use mod_suddendeath\local\question_repository;
-use mod_suddendeath\local\run_manager;
+use mod_onelife\local\modes;
+use mod_onelife\local\question_repository;
+use mod_onelife\local\run_manager;
 use stdClass;
 
 /**
  * Tests that run_started and run_finished fire once, and only where they should.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\event\run_started
- * @covers     \mod_suddendeath\event\run_finished
+ * @covers     \mod_onelife\event\run_started
+ * @covers     \mod_onelife\event\run_finished
  */
 final class run_events_test extends \advanced_testcase {
     /** @var stdClass The activity instance under test. */
@@ -94,12 +94,12 @@ final class run_events_test extends \advanced_testcase {
             $generator->create_question('multichoice', 'one_of_four', ['category' => $topic->id]);
         }
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', [
+        $this->instance = $this->getDataGenerator()->create_module('onelife', [
             'course' => $course->id,
             'targetstreak' => 15,
             'allowedmodes' => 'single,multi,all',
         ]);
-        $cm = get_coursemodule_from_instance('suddendeath', $this->instance->id, $course->id, false, MUST_EXIST);
+        $cm = get_coursemodule_from_instance('onelife', $this->instance->id, $course->id, false, MUST_EXIST);
         $this->cmid = (int) $cm->id;
 
         // Runs only ever start from a learner's own request, so the acting user is the
@@ -409,7 +409,7 @@ final class run_events_test extends \advanced_testcase {
 
         foreach ($events as $event) {
             $this->assertStringContainsString((string) $this->userid, $event->get_description());
-            $this->assertStringContainsString('/mod/suddendeath/view.php', $event->get_url()->out(false));
+            $this->assertStringContainsString('/mod/onelife/view.php', $event->get_url()->out(false));
         }
     }
 }

@@ -28,20 +28,20 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 /**
  * Tests for the scope_validator class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\local\scope_validator
+ * @covers     \mod_onelife\local\scope_validator
  */
 final class scope_validator_test extends \basic_testcase {
     /** @var int[] Topic ids that exist in the fixture bank. */

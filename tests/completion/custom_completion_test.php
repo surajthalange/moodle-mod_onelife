@@ -24,12 +24,12 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\completion;
+namespace mod_onelife\completion;
 
 use cm_info;
 use stdClass;
@@ -37,10 +37,10 @@ use stdClass;
 /**
  * Tests for the custom_completion class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\completion\custom_completion
+ * @covers     \mod_onelife\completion\custom_completion
  */
 final class custom_completion_test extends \advanced_testcase {
     /** @var stdClass The course. */
@@ -64,7 +64,7 @@ final class custom_completion_test extends \advanced_testcase {
         $this->userid = (int) $this->getDataGenerator()->create_user()->id;
         $this->getDataGenerator()->enrol_user($this->userid, $this->course->id);
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', [
+        $this->instance = $this->getDataGenerator()->create_module('onelife', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionstreak' => $completionstreak,
@@ -80,8 +80,8 @@ final class custom_completion_test extends \advanced_testcase {
     private function finished_run(int $streak, int $agoseconds = 100): void {
         global $DB;
 
-        $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $this->instance->id,
+        $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $this->instance->id,
             'userid' => $this->userid,
             'scopetype' => 'all',
             'topicids' => '',
@@ -99,7 +99,7 @@ final class custom_completion_test extends \advanced_testcase {
      * @return int COMPLETION_COMPLETE or COMPLETION_INCOMPLETE
      */
     private function state(): int {
-        $cm = cm_info::create(get_coursemodule_from_instance('suddendeath', $this->instance->id));
+        $cm = cm_info::create(get_coursemodule_from_instance('onelife', $this->instance->id));
 
         return (new custom_completion($cm, $this->userid))->get_state('completionstreak');
     }
@@ -182,8 +182,8 @@ final class custom_completion_test extends \advanced_testcase {
 
         $this->set_up(5);
 
-        $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $this->instance->id,
+        $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $this->instance->id,
             'userid' => $this->userid,
             'scopetype' => 'all',
             'topicids' => '',
@@ -206,8 +206,8 @@ final class custom_completion_test extends \advanced_testcase {
         $this->set_up(5);
 
         $other = (int) $this->getDataGenerator()->create_user()->id;
-        $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $this->instance->id,
+        $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $this->instance->id,
             'userid' => $other,
             'scopetype' => 'all',
             'topicids' => '',
@@ -229,9 +229,9 @@ final class custom_completion_test extends \advanced_testcase {
 
         $this->set_up(5);
 
-        $other = $this->getDataGenerator()->create_module('suddendeath', ['course' => $this->course->id]);
-        $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $other->id,
+        $other = $this->getDataGenerator()->create_module('onelife', ['course' => $this->course->id]);
+        $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $other->id,
             'userid' => $this->userid,
             'scopetype' => 'all',
             'topicids' => '',
@@ -258,7 +258,7 @@ final class custom_completion_test extends \advanced_testcase {
 
         $this->finished_run(50);
 
-        $cm = cm_info::create(get_coursemodule_from_instance('suddendeath', $this->instance->id));
+        $cm = cm_info::create(get_coursemodule_from_instance('onelife', $this->instance->id));
         $available = (new custom_completion($cm, $this->userid))->get_available_custom_rules();
 
         $this->assertNotContains('completionstreak', $available, 'A zero streak must disable the rule.');
@@ -270,7 +270,7 @@ final class custom_completion_test extends \advanced_testcase {
     public function test_a_set_streak_makes_the_rule_available(): void {
         $this->set_up(5);
 
-        $cm = cm_info::create(get_coursemodule_from_instance('suddendeath', $this->instance->id));
+        $cm = cm_info::create(get_coursemodule_from_instance('onelife', $this->instance->id));
         $available = (new custom_completion($cm, $this->userid))->get_available_custom_rules();
 
         $this->assertContains('completionstreak', $available);
@@ -282,7 +282,7 @@ final class custom_completion_test extends \advanced_testcase {
     public function test_rule_description_mentions_the_target(): void {
         $this->set_up(7);
 
-        $cm = cm_info::create(get_coursemodule_from_instance('suddendeath', $this->instance->id));
+        $cm = cm_info::create(get_coursemodule_from_instance('onelife', $this->instance->id));
         $descriptions = (new custom_completion($cm, $this->userid))->get_custom_rule_descriptions();
 
         $this->assertArrayHasKey('completionstreak', $descriptions);
@@ -295,7 +295,7 @@ final class custom_completion_test extends \advanced_testcase {
     public function test_sort_order_puts_view_first(): void {
         $this->set_up(5);
 
-        $cm = cm_info::create(get_coursemodule_from_instance('suddendeath', $this->instance->id));
+        $cm = cm_info::create(get_coursemodule_from_instance('onelife', $this->instance->id));
         $order = (new custom_completion($cm, $this->userid))->get_sort_order();
 
         $this->assertSame(['completionview', 'completionstreak'], $order);

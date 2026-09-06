@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Lists every Sudden Death activity in a course.
+ * Lists every One Life activity in a course.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');
-require_once($CFG->dirroot . '/mod/suddendeath/lib.php');
+require_once($CFG->dirroot . '/mod/onelife/lib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -32,22 +32,22 @@ require_login($course);
 
 $context = context_course::instance($course->id);
 
-$event = \mod_suddendeath\event\course_module_instance_list_viewed::create(['context' => $context]);
+$event = \mod_onelife\event\course_module_instance_list_viewed::create(['context' => $context]);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-$PAGE->set_url('/mod/suddendeath/index.php', ['id' => $id]);
+$PAGE->set_url('/mod/onelife/index.php', ['id' => $id]);
 $PAGE->set_context($context);
-$PAGE->set_title(format_string($course->shortname) . ': ' . get_string('modulenameplural', 'mod_suddendeath'));
+$PAGE->set_title(format_string($course->shortname) . ': ' . get_string('modulenameplural', 'mod_onelife'));
 $PAGE->set_heading(format_string($course->fullname));
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('modulenameplural', 'mod_suddendeath'));
+echo $OUTPUT->heading(get_string('modulenameplural', 'mod_onelife'));
 
-$instances = get_all_instances_in_course('suddendeath', $course);
+$instances = get_all_instances_in_course('onelife', $course);
 
 if (empty($instances)) {
-    echo $OUTPUT->notification(get_string('noinstances', 'mod_suddendeath'), \core\output\notification::NOTIFY_INFO);
+    echo $OUTPUT->notification(get_string('noinstances', 'mod_onelife'), \core\output\notification::NOTIFY_INFO);
     echo $OUTPUT->footer();
     exit;
 }
@@ -66,7 +66,7 @@ if ($usesections) {
 
 foreach ($instances as $instance) {
     $link = html_writer::link(
-        new moodle_url('/mod/suddendeath/view.php', ['id' => $instance->coursemodule]),
+        new moodle_url('/mod/onelife/view.php', ['id' => $instance->coursemodule]),
         format_string($instance->name),
         $instance->visible ? [] : ['class' => 'dimmed']
     );

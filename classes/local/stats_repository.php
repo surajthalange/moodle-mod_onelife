@@ -17,12 +17,12 @@
 /**
  * Personal records across runs.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use stdClass;
 
@@ -30,7 +30,7 @@ use stdClass;
  * A learner's personal bests, per scope, in one activity.
  *
  * This is the only code that reads across runs, so it is the only place a missing
- * condition would show one learner another's results. Both userid and suddendeathid
+ * condition would show one learner another's results. Both userid and onelifeid
  * are conditions on the single query that reads runs; there is no code path that
  * reads a run without them.
  *
@@ -39,7 +39,7 @@ use stdClass;
  * is a set of topics rather than the string the column happens to hold, and SQL
  * cannot group on that without a canonical column to group by.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -69,20 +69,20 @@ class stats_repository {
     /**
      * A learner's records in one activity, best scope first.
      *
-     * @param int $suddendeathid the activity instance
+     * @param int $onelifeid the activity instance
      * @param int $userid the learner
      * @return stdClass[] records keyed by scope key
      */
-    public function get_records(int $suddendeathid, int $userid): array {
+    public function get_records(int $onelifeid, int $userid): array {
         global $DB;
 
-        // Query one. Both conditions are mandatory: suddendeathid keeps other
+        // Query one. Both conditions are mandatory: onelifeid keeps other
         // activities out, userid keeps other learners out. Unfinished runs are not
         // records yet, so an open run cannot inflate a best just by existing.
         $runs = $DB->get_records_select(
-            'suddendeath_run',
-            'suddendeathid = :suddendeathid AND userid = :userid AND timefinish IS NOT NULL',
-            ['suddendeathid' => $suddendeathid, 'userid' => $userid],
+            'onelife_run',
+            'onelifeid = :onelifeid AND userid = :userid AND timefinish IS NOT NULL',
+            ['onelifeid' => $onelifeid, 'userid' => $userid],
             'timefinish DESC, id DESC',
             'id, scopetype, topicids, streak, timefinish'
         );
@@ -159,7 +159,7 @@ class stats_repository {
             );
         }
 
-        $missing = get_string('deletedtopic', 'mod_suddendeath');
+        $missing = get_string('deletedtopic', 'mod_onelife');
 
         foreach ($records as $record) {
             foreach ($record->topicids as $topicid) {

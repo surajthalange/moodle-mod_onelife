@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Tests for the mod_suddendeath topic repository.
+ * Tests for the mod_onelife topic repository.
  *
  * Every behaviour covered here was a real defect in the reference implementation,
  * so each test is written to fail against the naive version of the same logic.
@@ -26,12 +26,12 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 use context_course;
 use context_coursecat;
@@ -41,10 +41,10 @@ use stdClass;
 /**
  * Tests for the topic_repository class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\topic_repository
+ * @covers     \mod_onelife\topic_repository
  */
 final class topic_repository_test extends \advanced_testcase {
     /**

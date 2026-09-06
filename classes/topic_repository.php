@@ -17,19 +17,19 @@
 /**
  * Locates the topic bank and its topics for a course.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 use context_course;
 use context_module;
 use stdClass;
 
 /**
- * Finds the question categories a Sudden Death activity draws its topics from.
+ * Finds the question categories a One Life activity draws its topics from.
  *
  * Three behaviours here are load-bearing and each is covered by its own test:
  *
@@ -44,7 +44,7 @@ use stdClass;
  *    id than anything a teacher made. There is no schema flag marking it, so it is
  *    identified by the name core gives it.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -125,7 +125,7 @@ final class topic_repository {
             if ($configured !== null) {
                 return $configured;
             }
-            $this->warnings[] = get_string('warningtopicbankunusable', 'mod_suddendeath');
+            $this->warnings[] = get_string('warningtopicbankunusable', 'mod_onelife');
         }
 
         foreach ($contextids as $contextid) {

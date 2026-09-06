@@ -25,22 +25,22 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use stdClass;
 
 /**
  * Tests for the stats_repository class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\local\stats_repository
+ * @covers     \mod_onelife\local\stats_repository
  */
 final class stats_repository_test extends \advanced_testcase {
     /** @var stdClass The activity instance under test. */
@@ -65,14 +65,14 @@ final class stats_repository_test extends \advanced_testcase {
         $this->userid = (int) $this->getDataGenerator()->create_user()->id;
         $this->otheruserid = (int) $this->getDataGenerator()->create_user()->id;
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $course->id]);
-        $this->otherinstance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $course->id]);
+        $this->instance = $this->getDataGenerator()->create_module('onelife', ['course' => $course->id]);
+        $this->otherinstance = $this->getDataGenerator()->create_module('onelife', ['course' => $course->id]);
     }
 
     /**
      * Insert a run row directly, so streaks and times can be set exactly.
      *
-     * @param int $suddendeathid the instance
+     * @param int $onelifeid the instance
      * @param int $userid the learner
      * @param string $scopetype the mode
      * @param string $topicids the raw topicids column value
@@ -81,7 +81,7 @@ final class stats_repository_test extends \advanced_testcase {
      * @return int the run id
      */
     private function make_run(
-        int $suddendeathid,
+        int $onelifeid,
         int $userid,
         string $scopetype,
         string $topicids,
@@ -90,8 +90,8 @@ final class stats_repository_test extends \advanced_testcase {
     ): int {
         global $DB;
 
-        return (int) $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $suddendeathid,
+        return (int) $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $onelifeid,
             'userid' => $userid,
             'scopetype' => $scopetype,
             'topicids' => $topicids,

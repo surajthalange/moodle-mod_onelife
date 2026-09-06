@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * English strings for mod_suddendeath.
+ * English strings for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -55,13 +55,13 @@ $string['errunknowntopic'] = 'That topic is not part of this activity.';
 $string['eventrunfinished'] = 'Run finished';
 $string['eventrunstarted'] = 'Run started';
 $string['explanationconvention'] = 'Explanations in question feedback';
-$string['explanationconvention_help'] = 'After each answer, Sudden Death shows the learner an explanation taken from the question\'s general feedback.
+$string['explanationconvention_help'] = 'After each answer, One Life shows the learner an explanation taken from the question\'s general feedback.
 
 Where the general feedback contains a horizontal rule, only the part **after the first rule** is shown as the explanation. Anything before it is treated as a lead-in and is not displayed.
 
 Where the general feedback contains no horizontal rule, all of it is shown.
 
-This lets you write a short congratulatory line for the question bank and a longer teaching explanation for Sudden Death, in one field:
+This lets you write a short congratulatory line for the question bank and a longer teaching explanation for One Life, in one field:
 
 > Correct!
 > ---
@@ -72,36 +72,41 @@ $string['finalstreak'] = 'You reached a streak of {$a}.';
 $string['mode_all'] = 'All topics';
 $string['mode_multi'] = 'Selected topics';
 $string['mode_single'] = 'One topic';
-$string['modulename'] = 'Sudden Death';
-$string['modulename_help'] = 'Sudden Death is a self-directed revision activity built from the course question bank.
+$string['modulename'] = 'One Life';
+$string['modulename_help'] = 'One Life is a self-directed revision activity built from the course question bank.
 
 The learner chooses which topics to practise and answers multiple-choice questions one at a time. A single wrong answer ends the run, and the score is the streak reached. Personal bests are tracked per scope, so there is always something to beat.
 
 The activity is deliberately ungraded, making it low-stakes practice rather than assessment.';
-$string['modulenameplural'] = 'Sudden Death activities';
-$string['noinstances'] = 'There are no Sudden Death activities in this course.';
+$string['modulenameplural'] = 'One Life activities';
+$string['noinstances'] = 'There are no One Life activities in this course.';
 $string['norecordsyet'] = 'No records yet. Play a run and your best streak will appear here.';
+$string['onelife:addinstance'] = 'Add a new One Life activity';
+$string['onelife:play'] = 'Play a One Life run';
+$string['onelife:view'] = 'View a One Life activity';
+$string['onelifename'] = 'One Life name';
+$string['onelifename_help'] = 'The name shown to learners on the course page.';
 $string['personalrecords'] = 'Your personal records';
-$string['pluginadministration'] = 'Sudden Death administration';
-$string['pluginname'] = 'Sudden Death';
+$string['pluginadministration'] = 'One Life administration';
+$string['pluginname'] = 'One Life';
 $string['poolexhausted'] = 'You answered every available question correctly. There are no more questions to ask.';
-$string['privacy:metadata:suddendeath_answer'] = 'Each question answered during a run, and whether it was correct.';
-$string['privacy:metadata:suddendeath_answer:correct'] = 'Whether the answer given was correct.';
-$string['privacy:metadata:suddendeath_answer:questionid'] = 'The question that was asked.';
-$string['privacy:metadata:suddendeath_answer:runid'] = 'The run this answer belongs to.';
-$string['privacy:metadata:suddendeath_answer:timecreated'] = 'When the answer was given.';
-$string['privacy:metadata:suddendeath_answer:topicid'] = 'The topic the question came from.';
-$string['privacy:metadata:suddendeath_run'] = 'One play-through of a Sudden Death activity by a learner.';
-$string['privacy:metadata:suddendeath_run:currentquestionid'] = 'The question in progress, while the run is unfinished.';
-$string['privacy:metadata:suddendeath_run:scopetype'] = 'Whether the learner chose one topic, several, or all of them.';
-$string['privacy:metadata:suddendeath_run:streak'] = 'The streak the learner reached.';
-$string['privacy:metadata:suddendeath_run:suddendeathid'] = 'The activity the run belongs to.';
-$string['privacy:metadata:suddendeath_run:targetstreak'] = 'The target streak in effect for the run.';
-$string['privacy:metadata:suddendeath_run:timecreated'] = 'When the run started.';
-$string['privacy:metadata:suddendeath_run:timefinish'] = 'When the run finished.';
-$string['privacy:metadata:suddendeath_run:topicids'] = 'The topics the learner chose to practise.';
-$string['privacy:metadata:suddendeath_run:userid'] = 'The learner who played the run.';
-$string['privacy:path:runs'] = 'Sudden Death runs';
+$string['privacy:metadata:onelife_answer'] = 'Each question answered during a run, and whether it was correct.';
+$string['privacy:metadata:onelife_answer:correct'] = 'Whether the answer given was correct.';
+$string['privacy:metadata:onelife_answer:questionid'] = 'The question that was asked.';
+$string['privacy:metadata:onelife_answer:runid'] = 'The run this answer belongs to.';
+$string['privacy:metadata:onelife_answer:timecreated'] = 'When the answer was given.';
+$string['privacy:metadata:onelife_answer:topicid'] = 'The topic the question came from.';
+$string['privacy:metadata:onelife_run'] = 'One play-through of a One Life activity by a learner.';
+$string['privacy:metadata:onelife_run:currentquestionid'] = 'The question in progress, while the run is unfinished.';
+$string['privacy:metadata:onelife_run:onelifeid'] = 'The activity the run belongs to.';
+$string['privacy:metadata:onelife_run:scopetype'] = 'Whether the learner chose one topic, several, or all of them.';
+$string['privacy:metadata:onelife_run:streak'] = 'The streak the learner reached.';
+$string['privacy:metadata:onelife_run:targetstreak'] = 'The target streak in effect for the run.';
+$string['privacy:metadata:onelife_run:timecreated'] = 'When the run started.';
+$string['privacy:metadata:onelife_run:timefinish'] = 'When the run finished.';
+$string['privacy:metadata:onelife_run:topicids'] = 'The topics the learner chose to practise.';
+$string['privacy:metadata:onelife_run:userid'] = 'The learner who played the run.';
+$string['privacy:path:runs'] = 'One Life runs';
 $string['recordbest'] = 'Best streak';
 $string['recordlast'] = 'Last run';
 $string['recordruns'] = 'Runs';
@@ -111,11 +116,6 @@ $string['runover'] = 'Run over';
 $string['runsdeleted'] = 'Runs and answers deleted';
 $string['startrun'] = 'Start';
 $string['streaksofar'] = 'Streak: {$a}';
-$string['suddendeath:addinstance'] = 'Add a new Sudden Death activity';
-$string['suddendeath:play'] = 'Play a Sudden Death run';
-$string['suddendeath:view'] = 'View a Sudden Death activity';
-$string['suddendeathname'] = 'Sudden Death name';
-$string['suddendeathname_help'] = 'The name shown to learners on the course page.';
 $string['targetstreak'] = 'Target streak';
 $string['targetstreak_help'] = 'The streak that counts as 100% in the run summary.
 

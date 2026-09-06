@@ -17,12 +17,12 @@
 /**
  * Renderable for one question in a run.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
 use renderer_base;
 use renderable;
@@ -36,7 +36,7 @@ use templatable;
  * here rather than in the template, so the answer key cannot reach the page source
  * even if the template changes.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -72,7 +72,7 @@ class play_page implements renderable, templatable {
      * Build the template context.
      *
      * @param renderer_base $output the renderer
-     * @return stdClass the context for mod_suddendeath/play
+     * @return stdClass the context for mod_onelife/play
      */
     public function export_for_template(renderer_base $output): stdClass {
         $context = new stdClass();

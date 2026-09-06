@@ -17,14 +17,14 @@
 /**
  * Renderable for the scope picker page.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
-use mod_suddendeath\local\modes;
+use mod_onelife\local\modes;
 use renderer_base;
 use renderable;
 use stdClass;
@@ -40,7 +40,7 @@ use templatable;
  * resolved but holds no topics is treated exactly like no bank: an empty form would
  * invite the learner to submit nothing and be told off for it.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -112,7 +112,7 @@ class picker_page implements renderable, templatable {
      * Build the template context.
      *
      * @param renderer_base $output the renderer
-     * @return stdClass the context for mod_suddendeath/picker
+     * @return stdClass the context for mod_onelife/picker
      */
     public function export_for_template(renderer_base $output): stdClass {
         // A bank that resolved but holds no topics is as unplayable as no bank at all,
@@ -123,7 +123,7 @@ class picker_page implements renderable, templatable {
         $context->name = format_string($this->instance->name);
         $context->hasbank = $this->hasbank;
         $context->hasnotice = !$playable;
-        $context->notice = $playable ? '' : get_string('topicbanknone', 'mod_suddendeath');
+        $context->notice = $playable ? '' : get_string('topicbanknone', 'mod_onelife');
         $context->formhtml = $playable ? $this->formhtml : '';
 
         // The mode and topic controls are rendered by the picker form, which formslib

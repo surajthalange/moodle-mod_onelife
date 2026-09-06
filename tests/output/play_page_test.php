@@ -20,23 +20,23 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
 use stdClass;
 
 /**
  * Tests for play_page and summary_page.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\output\play_page
- * @covers     \mod_suddendeath\output\summary_page
+ * @covers     \mod_onelife\output\play_page
+ * @covers     \mod_onelife\output\summary_page
  */
 final class play_page_test extends \advanced_testcase {
     /**
@@ -71,7 +71,7 @@ final class play_page_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $page = new play_page($this->question(), 3, 15, 42);
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $this->assertStringContainsString('ATP', $context->questiontext);
         $this->assertSame(3, $context->streak);
@@ -97,7 +97,7 @@ final class play_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $context = (new play_page($this->question(), 0, 15, 42))->export_for_template($renderer);
 
         foreach ($context->answers as $answer) {
@@ -105,7 +105,7 @@ final class play_page_test extends \advanced_testcase {
             $this->assertArrayNotHasKey('correct', $answer);
         }
 
-        $html = $renderer->render_from_template('mod_suddendeath/play', $context);
+        $html = $renderer->render_from_template('mod_onelife/play', $context);
         $this->assertStringNotContainsString('fraction', $html);
     }
 
@@ -118,7 +118,7 @@ final class play_page_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $context = (new play_page($this->question(), 0, 15, 42))
-            ->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+            ->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $this->assertSame(sesskey(), $context->sesskey);
     }
@@ -131,9 +131,9 @@ final class play_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $context = (new play_page($this->question(), 2, 15, 42))->export_for_template($renderer);
-        $html = $renderer->render_from_template('mod_suddendeath/play', $context);
+        $html = $renderer->render_from_template('mod_onelife/play', $context);
 
         $this->assertStringContainsString('Mitochondrion', $html);
         $this->assertStringContainsString('Which organelle makes ATP?', $html);
@@ -148,7 +148,7 @@ final class play_page_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $page = new summary_page(7, 15, 'Mitochondrion', '<p>ATP is made in the mitochondrion.</p>', false, 42);
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $this->assertSame(7, $context->streak);
         $this->assertSame(15, $context->targetstreak);
@@ -168,7 +168,7 @@ final class play_page_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $page = new summary_page(4, 15, '', '', true, 42);
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $this->assertTrue($context->exhausted);
         $this->assertNotEmpty($context->exhaustedmessage);
@@ -183,7 +183,7 @@ final class play_page_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $page = new summary_page(0, 15, 'Mitochondrion', '', false, 42);
-        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+        $context = $page->export_for_template($PAGE->get_renderer('mod_onelife'));
 
         $this->assertFalse($context->hasexplanation);
         $this->assertSame(0, $context->percent);
@@ -197,9 +197,9 @@ final class play_page_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $renderer = $PAGE->get_renderer('mod_onelife');
         $page = new summary_page(7, 15, 'Mitochondrion', '<p>Because mitochondria.</p>', false, 42);
-        $html = $renderer->render_from_template('mod_suddendeath/summary', $page->export_for_template($renderer));
+        $html = $renderer->render_from_template('mod_onelife/summary', $page->export_for_template($renderer));
 
         $this->assertStringContainsString('Mitochondrion', $html);
         $this->assertStringContainsString('Because mitochondria.', $html);

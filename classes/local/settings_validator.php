@@ -17,14 +17,14 @@
 /**
  * Server-side validation of the settings form.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
-use mod_suddendeath\topic_repository;
+use mod_onelife\topic_repository;
 
 /**
  * The rules the settings form enforces, independent of the form itself.
@@ -36,7 +36,7 @@ use mod_suddendeath\topic_repository;
  * Client-side JavaScript is a usability aid only. Every rule here must hold for a
  * submission made with scripting disabled or forged outright.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -67,26 +67,26 @@ final class settings_validator {
         $errors = [];
 
         if (modes::from_form_data($data) === []) {
-            $errors[modes::GROUP_NAME] = get_string('errnomodes', 'mod_suddendeath');
+            $errors[modes::GROUP_NAME] = get_string('errnomodes', 'mod_onelife');
         }
 
         $targetstreak = $data['targetstreak'] ?? '';
         if (!$this->is_whole_number($targetstreak) || (int) $targetstreak < 1) {
-            $errors['targetstreak'] = get_string('errtargetstreak', 'mod_suddendeath');
+            $errors['targetstreak'] = get_string('errtargetstreak', 'mod_onelife');
         }
 
         // Blank and zero both disable the completion rule and are valid; negative is not.
         $completionstreak = $data['completionstreak'] ?? '';
         if (trim((string) $completionstreak) !== '') {
             if (!$this->is_whole_number($completionstreak) || (int) $completionstreak < 0) {
-                $errors['completionstreak'] = get_string('errcompletionstreak', 'mod_suddendeath');
+                $errors['completionstreak'] = get_string('errcompletionstreak', 'mod_onelife');
             }
         }
 
         // Zero means auto-detect, which is always allowed.
         $bankid = (int) ($data['topicbankcategoryid'] ?? 0);
         if ($bankid > 0 && !$this->repository->is_usable_bank($courseid, $bankid)) {
-            $errors['topicbankcategoryid'] = get_string('errtopicbank', 'mod_suddendeath');
+            $errors['topicbankcategoryid'] = get_string('errtopicbank', 'mod_onelife');
         }
 
         return $errors;

@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Pure scoring logic for mod_suddendeath.
+ * Pure scoring logic for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 use stdClass;
 
 /**
- * Scoring rules for a Sudden Death run.
+ * Scoring rules for a One Life run.
  *
  * Every method is static and pure: no database, no output, no global state, no
  * side effects. Callers pass in everything the calculation needs, which is what
@@ -36,7 +36,7 @@ use stdClass;
  * Question selection is deliberately absent. It needs the question bank and the
  * context resolution rules, so it lives with topic_repository instead.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

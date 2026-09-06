@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Settings form for mod_suddendeath.
+ * Settings form for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,9 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
-use mod_suddendeath\local\modes;
-use mod_suddendeath\local\settings_validator;
-use mod_suddendeath\topic_repository;
+use mod_onelife\local\modes;
+use mod_onelife\local\settings_validator;
+use mod_onelife\topic_repository;
 
 /**
  * Module settings form.
@@ -48,11 +48,11 @@ use mod_suddendeath\topic_repository;
  *   completion_rule_enabled() rather than by a rule that cannot be satisfied while
  *   the field is hidden.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_suddendeath_mod_form extends moodleform_mod {
+class mod_onelife_mod_form extends moodleform_mod {
     /**
      * Define the form elements.
      */
@@ -63,7 +63,7 @@ class mod_suddendeath_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('suddendeathname', 'mod_suddendeath'), ['size' => '64']);
+        $mform->addElement('text', 'name', get_string('onelifename', 'mod_onelife'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -71,7 +71,7 @@ class mod_suddendeath_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('name', 'suddendeathname', 'mod_suddendeath');
+        $mform->addHelpButton('name', 'onelifename', 'mod_onelife');
 
         $this->standard_intro_elements();
 
@@ -80,26 +80,26 @@ class mod_suddendeath_mod_form extends moodleform_mod {
         $mform->addElement(
             'select',
             'topicbankcategoryid',
-            get_string('topicbank', 'mod_suddendeath'),
+            get_string('topicbank', 'mod_onelife'),
             $this->topic_bank_options((int) $COURSE->id)
         );
         $mform->setType('topicbankcategoryid', PARAM_INT);
         $mform->setDefault('topicbankcategoryid', 0);
-        $mform->addHelpButton('topicbankcategoryid', 'topicbank', 'mod_suddendeath');
+        $mform->addHelpButton('topicbankcategoryid', 'topicbank', 'mod_onelife');
 
         // Where authors learn that a horizontal rule splits their general feedback.
         $mform->addElement(
             'static',
             'explanationconvention',
-            get_string('explanationconvention', 'mod_suddendeath'),
+            get_string('explanationconvention', 'mod_onelife'),
             ''
         );
-        $mform->addHelpButton('explanationconvention', 'explanationconvention', 'mod_suddendeath');
+        $mform->addHelpButton('explanationconvention', 'explanationconvention', 'mod_onelife');
 
-        $mform->addElement('text', 'targetstreak', get_string('targetstreak', 'mod_suddendeath'), ['size' => 6]);
+        $mform->addElement('text', 'targetstreak', get_string('targetstreak', 'mod_onelife'), ['size' => 6]);
         $mform->setType('targetstreak', PARAM_RAW_TRIMMED);
         $mform->setDefault('targetstreak', 15);
-        $mform->addHelpButton('targetstreak', 'targetstreak', 'mod_suddendeath');
+        $mform->addHelpButton('targetstreak', 'targetstreak', 'mod_onelife');
 
         $modeelements = [];
         foreach (modes::codes() as $code) {
@@ -113,11 +113,11 @@ class mod_suddendeath_mod_form extends moodleform_mod {
         $mform->addGroup(
             $modeelements,
             modes::GROUP_NAME,
-            get_string('allowedmodes', 'mod_suddendeath'),
+            get_string('allowedmodes', 'mod_onelife'),
             ['<br />'],
             false
         );
-        $mform->addHelpButton(modes::GROUP_NAME, 'allowedmodes', 'mod_suddendeath');
+        $mform->addHelpButton(modes::GROUP_NAME, 'allowedmodes', 'mod_onelife');
         foreach (modes::codes() as $code) {
             $mform->setType(modes::element_name($code), PARAM_INT);
             $mform->setDefault(modes::element_name($code), 1);
@@ -137,7 +137,7 @@ class mod_suddendeath_mod_form extends moodleform_mod {
     private function topic_bank_options(int $courseid): array {
         global $DB;
 
-        $options = [0 => get_string('topicbankautodetect', 'mod_suddendeath')];
+        $options = [0 => get_string('topicbankautodetect', 'mod_onelife')];
 
         $repository = new topic_repository();
 
@@ -188,7 +188,7 @@ class mod_suddendeath_mod_form extends moodleform_mod {
                 'checkbox',
                 'completionstreakenabled',
                 '',
-                get_string('completionstreak', 'mod_suddendeath')
+                get_string('completionstreak', 'mod_onelife')
             ),
             $mform->createElement('text', 'completionstreak', '', ['size' => 4]),
         ];
@@ -197,11 +197,11 @@ class mod_suddendeath_mod_form extends moodleform_mod {
         $mform->addGroup(
             $group,
             'completionstreakgroup',
-            get_string('completionstreakgroup', 'mod_suddendeath'),
+            get_string('completionstreakgroup', 'mod_onelife'),
             [' '],
             false
         );
-        $mform->addHelpButton('completionstreakgroup', 'completionstreak', 'mod_suddendeath');
+        $mform->addHelpButton('completionstreakgroup', 'completionstreak', 'mod_onelife');
 
         // Named elements, not integers, so this actually takes effect.
         $mform->disabledIf('completionstreak', 'completionstreakenabled', 'notchecked');

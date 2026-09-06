@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Restore steps for mod_suddendeath.
+ * Restore steps for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 /**
- * Reads suddendeath.xml back into the database.
+ * Reads onelife.xml back into the database.
  *
  * Three kinds of foreign id have to be translated, not merely copied: the learner,
  * the questions that were asked, and the topic categories that were in scope.
@@ -47,11 +47,11 @@
  * references are cleared. Everything else about a run survives either way: streak,
  * scope, timings, and therefore personal records and statistics.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_suddendeath_activity_structure_step extends restore_activity_structure_step {
+class restore_onelife_activity_structure_step extends restore_activity_structure_step {
     /**
      * The paths this step handles.
      *
@@ -61,13 +61,13 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
         $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
-        $paths[] = new restore_path_element('suddendeath', '/activity/suddendeath');
+        $paths[] = new restore_path_element('onelife', '/activity/onelife');
 
         if ($userinfo) {
-            $paths[] = new restore_path_element('suddendeath_run', '/activity/suddendeath/runs/run');
+            $paths[] = new restore_path_element('onelife_run', '/activity/onelife/runs/run');
             $paths[] = new restore_path_element(
-                'suddendeath_answer',
-                '/activity/suddendeath/runs/run/answers/answer'
+                'onelife_answer',
+                '/activity/onelife/runs/run/answers/answer'
             );
         }
 
@@ -79,7 +79,7 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
      *
      * @param array $data the instance data
      */
-    protected function process_suddendeath($data) {
+    protected function process_onelife($data) {
         global $DB;
 
         $data = (object) $data;
@@ -98,7 +98,7 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
             ) ?: null;
         }
 
-        $newitemid = $DB->insert_record('suddendeath', $data);
+        $newitemid = $DB->insert_record('onelife', $data);
         $this->apply_activity_instance($newitemid);
     }
 
@@ -107,13 +107,13 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
      *
      * @param array $data the run data
      */
-    protected function process_suddendeath_run($data) {
+    protected function process_onelife_run($data) {
         global $DB;
 
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->suddendeathid = $this->get_new_parentid('suddendeath');
+        $data->onelifeid = $this->get_new_parentid('onelife');
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timecreated = $this->apply_date_offset($data->timecreated);
 
@@ -137,8 +137,8 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
             }
         }
 
-        $newitemid = $DB->insert_record('suddendeath_run', $data);
-        $this->set_mapping('suddendeath_run', $oldid, $newitemid);
+        $newitemid = $DB->insert_record('onelife_run', $data);
+        $this->set_mapping('onelife_run', $oldid, $newitemid);
     }
 
     /**
@@ -146,17 +146,17 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
      *
      * @param array $data the answer data
      */
-    protected function process_suddendeath_answer($data) {
+    protected function process_onelife_answer($data) {
         global $DB;
 
         $data = (object) $data;
 
-        $data->runid = $this->get_new_parentid('suddendeath_run');
+        $data->runid = $this->get_new_parentid('onelife_run');
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->questionid = (int) $this->get_mappingid('question', $data->questionid);
         $data->topicid = (int) $this->get_mappingid('question_category', $data->topicid);
 
-        $DB->insert_record('suddendeath_answer', $data);
+        $DB->insert_record('onelife_answer', $data);
     }
 
     /**
@@ -187,6 +187,6 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
      * Restore files attached to the activity.
      */
     protected function after_execute() {
-        $this->add_related_files('mod_suddendeath', 'intro', null);
+        $this->add_related_files('mod_onelife', 'intro', null);
     }
 }

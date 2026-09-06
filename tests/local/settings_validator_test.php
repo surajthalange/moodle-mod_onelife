@@ -27,12 +27,12 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 use context_course;
 use context_module;
@@ -40,10 +40,10 @@ use context_module;
 /**
  * Tests for the settings_validator class.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_suddendeath\local\settings_validator
+ * @covers     \mod_onelife\local\settings_validator
  */
 final class settings_validator_test extends \advanced_testcase {
     /**
@@ -107,7 +107,7 @@ final class settings_validator_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
 
         $this->assertSame([], $validator->validate($course->id, $this->valid_submission()));
     }
@@ -124,7 +124,7 @@ final class settings_validator_test extends \advanced_testcase {
 
         $data = $this->valid_submission(['mode_single' => '0', 'mode_multi' => '0', 'mode_all' => '0']);
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $data);
 
         $this->assertArrayHasKey(modes::GROUP_NAME, $errors);
@@ -139,7 +139,7 @@ final class settings_validator_test extends \advanced_testcase {
 
         $data = $this->valid_submission(['mode_single' => '0', 'mode_multi' => '0', 'mode_all' => '1']);
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
 
         $this->assertArrayNotHasKey(modes::GROUP_NAME, $validator->validate($course->id, $data));
     }
@@ -175,7 +175,7 @@ final class settings_validator_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission(['targetstreak' => $value]));
 
         if ($expecterror) {
@@ -211,7 +211,7 @@ final class settings_validator_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission(['completionstreak' => $value]));
 
         if ($expecterror) {
@@ -228,7 +228,7 @@ final class settings_validator_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission(['topicbankcategoryid' => 0]));
 
         $this->assertArrayNotHasKey('topicbankcategoryid', $errors);
@@ -242,7 +242,7 @@ final class settings_validator_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $bankid = $this->make_bank($course->id);
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission(['topicbankcategoryid' => $bankid]));
 
         $this->assertArrayNotHasKey('topicbankcategoryid', $errors);
@@ -255,7 +255,7 @@ final class settings_validator_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission(['topicbankcategoryid' => 123456789]));
 
         $this->assertArrayHasKey('topicbankcategoryid', $errors);
@@ -274,7 +274,7 @@ final class settings_validator_test extends \advanced_testcase {
         $othercourse = $this->getDataGenerator()->create_course();
         $foreignbankid = $this->make_bank($othercourse->id);
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $this->valid_submission([
             'topicbankcategoryid' => $foreignbankid,
         ]));
@@ -298,7 +298,7 @@ final class settings_validator_test extends \advanced_testcase {
             'mode_single' => '0',
         ]);
 
-        $validator = new settings_validator(new \mod_suddendeath\topic_repository());
+        $validator = new settings_validator(new \mod_onelife\topic_repository());
         $errors = $validator->validate($course->id, $data);
 
         $this->assertArrayHasKey('targetstreak', $errors);

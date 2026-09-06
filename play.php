@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plays a Sudden Death run.
+ * Plays a One Life run.
  *
  * A thin controller. It resolves the module, checks access, hands the submission to
  * run_manager and renders whatever comes back. Every decision about the run's state
  * belongs to run_manager, not here.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,32 +29,32 @@
 require('../../config.php');
 require_once($CFG->libdir . '/completionlib.php');
 
-use mod_suddendeath\local\run_manager;
-use mod_suddendeath\output\play_page;
-use mod_suddendeath\output\summary_page;
+use mod_onelife\local\run_manager;
+use mod_onelife\output\play_page;
+use mod_onelife\output\summary_page;
 
 $id = required_param('id', PARAM_INT);
 $questionid = optional_param('questionid', 0, PARAM_INT);
 $answerid = optional_param('answerid', 0, PARAM_INT);
 
-$cm = get_coursemodule_from_id('suddendeath', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id('onelife', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-$moduleinstance = $DB->get_record('suddendeath', ['id' => $cm->instance], '*', MUST_EXIST);
+$moduleinstance = $DB->get_record('onelife', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
-require_capability('mod/suddendeath:play', $context);
+require_capability('mod/onelife:play', $context);
 
-$PAGE->set_url('/mod/suddendeath/play.php', ['id' => $cm->id]);
+$PAGE->set_url('/mod/onelife/play.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 $PAGE->set_cm($cm, $course, $moduleinstance);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $manager = new run_manager();
-$viewurl = new moodle_url('/mod/suddendeath/view.php', ['id' => $cm->id]);
-$playurl = new moodle_url('/mod/suddendeath/play.php', ['id' => $cm->id]);
+$viewurl = new moodle_url('/mod/onelife/view.php', ['id' => $cm->id]);
+$playurl = new moodle_url('/mod/onelife/play.php', ['id' => $cm->id]);
 
 $run = $manager->get_in_progress_run((int) $moduleinstance->id, (int) $USER->id);
 
@@ -75,7 +75,7 @@ if ($answerid > 0 && confirm_sesskey()) {
         if ($outcome->reason === 'finished') {
             redirect($viewurl);
         }
-        redirect($playurl, get_string('answerrefused', 'mod_suddendeath'), null, \core\output\notification::NOTIFY_INFO);
+        redirect($playurl, get_string('answerrefused', 'mod_onelife'), null, \core\output\notification::NOTIFY_INFO);
     }
 
     if ($outcome->finished) {
@@ -91,7 +91,7 @@ if ($answerid > 0 && confirm_sesskey()) {
     }
 }
 
-$output = $PAGE->get_renderer('mod_suddendeath');
+$output = $PAGE->get_renderer('mod_onelife');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($moduleinstance->name));

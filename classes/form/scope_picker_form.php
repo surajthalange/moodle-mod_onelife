@@ -17,15 +17,15 @@
 /**
  * The learner's scope picker form.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\form;
+namespace mod_onelife\form;
 
-use mod_suddendeath\local\modes;
-use mod_suddendeath\local\scope_validator;
+use mod_onelife\local\modes;
+use mod_onelife\local\scope_validator;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,7 +44,7 @@ require_once($GLOBALS['CFG']->libdir . '/formslib.php');
  * Only permitted modes are added to the form, and scope_validator rejects any other
  * mode on submission, so the restriction does not depend on the markup.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -74,7 +74,7 @@ class scope_picker_form extends moodleform {
         $mform->addGroup(
             $moderadios,
             'scopetypegroup',
-            get_string('choosescope', 'mod_suddendeath'),
+            get_string('choosescope', 'mod_onelife'),
             ['<br />'],
             false
         );
@@ -94,7 +94,7 @@ class scope_picker_form extends moodleform {
             $mform->addGroup(
                 $topicradios,
                 'singletopicgroup',
-                get_string('choosetopic', 'mod_suddendeath'),
+                get_string('choosetopic', 'mod_onelife'),
                 ['<br />'],
                 false
             );
@@ -115,14 +115,14 @@ class scope_picker_form extends moodleform {
             $mform->addGroup(
                 $topicboxes,
                 scope_validator::TOPIC_GROUP,
-                get_string('choosetopics', 'mod_suddendeath'),
+                get_string('choosetopics', 'mod_onelife'),
                 ['<br />'],
                 false
             );
             $mform->hideIf(scope_validator::TOPIC_GROUP, 'scopetype', 'neq', modes::MULTI);
         }
 
-        $this->add_action_buttons(false, get_string('startrun', 'mod_suddendeath'));
+        $this->add_action_buttons(false, get_string('startrun', 'mod_onelife'));
     }
 
     /**

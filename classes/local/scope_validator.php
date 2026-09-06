@@ -17,12 +17,12 @@
 /**
  * Server-side rules for the scope picker.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\local;
+namespace mod_onelife\local;
 
 /**
  * What a learner is allowed to submit from the scope picker.
@@ -36,7 +36,7 @@ namespace mod_suddendeath\local;
  * Allowed modes and valid topic ids are passed in rather than looked up, so the
  * rules need no database and stay unit-testable.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -153,13 +153,13 @@ final class scope_validator {
      */
     public static function validate(array $allowedmodes, array $validtopicids, array $submitted): array {
         if ($validtopicids === []) {
-            return ['scopetype' => get_string('errnotopicsinbank', 'mod_suddendeath')];
+            return ['scopetype' => get_string('errnotopicsinbank', 'mod_onelife')];
         }
 
         $scopetype = (string) ($submitted['scopetype'] ?? '');
 
         if (!in_array($scopetype, modes::codes(), true) || !in_array($scopetype, $allowedmodes, true)) {
-            return ['scopetype' => get_string('errmodenotallowed', 'mod_suddendeath')];
+            return ['scopetype' => get_string('errmodenotallowed', 'mod_onelife')];
         }
 
         $chosen = self::chosen_topics($scopetype, $submitted);
@@ -185,11 +185,11 @@ final class scope_validator {
      */
     private static function validate_single(array $chosen, array $validtopicids): array {
         if (count($chosen) !== 1) {
-            return [self::SINGLE_ELEMENT => get_string('errchooseonetopic', 'mod_suddendeath')];
+            return [self::SINGLE_ELEMENT => get_string('errchooseonetopic', 'mod_onelife')];
         }
 
         if (!in_array($chosen[0], $validtopicids, true)) {
-            return [self::SINGLE_ELEMENT => get_string('errunknowntopic', 'mod_suddendeath')];
+            return [self::SINGLE_ELEMENT => get_string('errunknowntopic', 'mod_onelife')];
         }
 
         return [];
@@ -208,12 +208,12 @@ final class scope_validator {
      */
     private static function validate_multi(array $chosen, array $validtopicids): array {
         if ($chosen === []) {
-            return [self::TOPIC_GROUP => get_string('errchooseatopic', 'mod_suddendeath')];
+            return [self::TOPIC_GROUP => get_string('errchooseatopic', 'mod_onelife')];
         }
 
         foreach ($chosen as $topicid) {
             if (!in_array($topicid, $validtopicids, true)) {
-                return [self::TOPIC_GROUP => get_string('errunknowntopic', 'mod_suddendeath')];
+                return [self::TOPIC_GROUP => get_string('errunknowntopic', 'mod_onelife')];
             }
         }
 

@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Renderer for mod_suddendeath.
+ * Renderer for mod_onelife.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath\output;
+namespace mod_onelife\output;
 
 use plugin_renderer_base;
 
@@ -32,7 +32,7 @@ use plugin_renderer_base;
  * Each method does nothing but hand a renderable's exported context to its template,
  * so all presentation lives in Mustache and all decisions live in the renderable.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -44,7 +44,7 @@ class renderer extends plugin_renderer_base {
      * @return string the rendered HTML
      */
     protected function render_picker_page(picker_page $page): string {
-        return $this->render_from_template('mod_suddendeath/picker', $page->export_for_template($this));
+        return $this->render_from_template('mod_onelife/picker', $page->export_for_template($this));
     }
 
     /**
@@ -54,7 +54,7 @@ class renderer extends plugin_renderer_base {
      * @return string the rendered HTML
      */
     protected function render_play_page(play_page $page): string {
-        return $this->render_from_template('mod_suddendeath/play', $page->export_for_template($this));
+        return $this->render_from_template('mod_onelife/play', $page->export_for_template($this));
     }
 
     /**
@@ -64,6 +64,6 @@ class renderer extends plugin_renderer_base {
      * @return string the rendered HTML
      */
     protected function render_summary_page(summary_page $page): string {
-        return $this->render_from_template('mod_suddendeath/summary', $page->export_for_template($this));
+        return $this->render_from_template('mod_onelife/summary', $page->export_for_template($this));
     }
 }

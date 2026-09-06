@@ -23,22 +23,22 @@
  * Metadata stays in doc-comments rather than PHP attributes: attributes arrived in
  * PHPUnit 10 and Moodle 4.5, this plugin's floor, ships PHPUnit ^9.6.34.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_suddendeath;
+namespace mod_onelife;
 
 use stdClass;
 
 /**
- * Tests for suddendeath_reset_userdata and its form hooks.
+ * Tests for onelife_reset_userdata and its form hooks.
  *
- * @package    mod_suddendeath
+ * @package    mod_onelife
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     ::suddendeath_reset_userdata
+ * @covers     ::onelife_reset_userdata
  */
 final class reset_test extends \advanced_testcase {
     /** @var stdClass The course being reset. */
@@ -56,15 +56,15 @@ final class reset_test extends \advanced_testcase {
     private function set_up(): void {
         global $CFG;
 
-        require_once($CFG->dirroot . '/mod/suddendeath/lib.php');
+        require_once($CFG->dirroot . '/mod/onelife/lib.php');
 
         $this->resetAfterTest();
 
         $this->course = $this->getDataGenerator()->create_course();
         $othercourse = $this->getDataGenerator()->create_course();
 
-        $this->instance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $this->course->id]);
-        $this->otherinstance = $this->getDataGenerator()->create_module('suddendeath', ['course' => $othercourse->id]);
+        $this->instance = $this->getDataGenerator()->create_module('onelife', ['course' => $this->course->id]);
+        $this->otherinstance = $this->getDataGenerator()->create_module('onelife', ['course' => $othercourse->id]);
 
         $this->make_run((int) $this->instance->id);
         $this->make_run((int) $this->instance->id);
@@ -74,13 +74,13 @@ final class reset_test extends \advanced_testcase {
     /**
      * Record a finished run with one answer.
      *
-     * @param int $suddendeathid the instance
+     * @param int $onelifeid the instance
      */
-    private function make_run(int $suddendeathid): void {
+    private function make_run(int $onelifeid): void {
         global $DB;
 
-        $runid = $DB->insert_record('suddendeath_run', (object) [
-            'suddendeathid' => $suddendeathid,
+        $runid = $DB->insert_record('onelife_run', (object) [
+            'onelifeid' => $onelifeid,
             'userid' => 5,
             'scopetype' => 'all',
             'topicids' => '3,4',
@@ -91,7 +91,7 @@ final class reset_test extends \advanced_testcase {
             'timefinish' => time() - 100,
         ]);
 
-        $DB->insert_record('suddendeath_answer', (object) [
+        $DB->insert_record('onelife_answer', (object) [
             'runid' => $runid,
             'topicid' => 3,
             'questionid' => 9,
@@ -108,15 +108,15 @@ final class reset_test extends \advanced_testcase {
 
         $this->set_up();
 
-        $data = (object) ['courseid' => $this->course->id, 'reset_suddendeath_all' => 1];
-        $status = suddendeath_reset_userdata($data);
+        $data = (object) ['courseid' => $this->course->id, 'reset_onelife_all' => 1];
+        $status = onelife_reset_userdata($data);
 
         $this->assertNotEmpty($status);
-        $this->assertSame(0, $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id]));
+        $this->assertSame(0, $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id]));
 
         $orphans = $DB->count_records_sql(
-            'SELECT COUNT(1) FROM {suddendeath_answer} a
-               LEFT JOIN {suddendeath_run} r ON r.id = a.runid
+            'SELECT COUNT(1) FROM {onelife_answer} a
+               LEFT JOIN {onelife_run} r ON r.id = a.runid
               WHERE r.id IS NULL'
         );
         $this->assertSame(0, $orphans, 'Answers must go with their runs.');
@@ -130,14 +130,14 @@ final class reset_test extends \advanced_testcase {
 
         $this->set_up();
 
-        suddendeath_reset_userdata((object) [
+        onelife_reset_userdata((object) [
             'courseid' => $this->course->id,
-            'reset_suddendeath_all' => 1,
+            'reset_onelife_all' => 1,
         ]);
 
         $this->assertSame(
             1,
-            $DB->count_records('suddendeath_run', ['suddendeathid' => $this->otherinstance->id]),
+            $DB->count_records('onelife_run', ['onelifeid' => $this->otherinstance->id]),
             'Another course must be untouched.'
         );
     }
@@ -153,10 +153,10 @@ final class reset_test extends \advanced_testcase {
 
         $this->set_up();
 
-        $status = suddendeath_reset_userdata((object) ['courseid' => $this->course->id]);
+        $status = onelife_reset_userdata((object) ['courseid' => $this->course->id]);
 
         $this->assertSame([], $status);
-        $this->assertSame(2, $DB->count_records('suddendeath_run', ['suddendeathid' => $this->instance->id]));
+        $this->assertSame(2, $DB->count_records('onelife_run', ['onelifeid' => $this->instance->id]));
     }
 
     /**
@@ -165,13 +165,13 @@ final class reset_test extends \advanced_testcase {
     public function test_reset_reports_its_outcome(): void {
         $this->set_up();
 
-        $status = suddendeath_reset_userdata((object) [
+        $status = onelife_reset_userdata((object) [
             'courseid' => $this->course->id,
-            'reset_suddendeath_all' => 1,
+            'reset_onelife_all' => 1,
         ]);
 
         $this->assertCount(1, $status);
-        $this->assertSame(get_string('modulenameplural', 'mod_suddendeath'), $status[0]['component']);
+        $this->assertSame(get_string('modulenameplural', 'mod_onelife'), $status[0]['component']);
         $this->assertNotEmpty($status[0]['item']);
         $this->assertFalse($status[0]['error']);
     }
@@ -185,9 +185,9 @@ final class reset_test extends \advanced_testcase {
         $this->set_up();
 
         $form = new \MoodleQuickForm('reset', 'post', '/');
-        suddendeath_reset_course_form_definition($form);
+        onelife_reset_course_form_definition($form);
 
-        $this->assertTrue($form->elementExists('reset_suddendeath_all'));
+        $this->assertTrue($form->elementExists('reset_onelife_all'));
     }
 
     /**
@@ -196,9 +196,9 @@ final class reset_test extends \advanced_testcase {
     public function test_reset_form_defaults_to_on(): void {
         $this->set_up();
 
-        $defaults = suddendeath_reset_course_form_defaults($this->course);
+        $defaults = onelife_reset_course_form_defaults($this->course);
 
-        $this->assertArrayHasKey('reset_suddendeath_all', $defaults);
-        $this->assertSame(1, $defaults['reset_suddendeath_all']);
+        $this->assertArrayHasKey('reset_onelife_all', $defaults);
+        $this->assertSame(1, $defaults['reset_onelife_all']);
     }
 }

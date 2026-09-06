@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_suddendeath/picker
+    @template mod_onelife/picker
 
-    Scope picker page for a Sudden Death activity.
+    Scope picker page for a One Life activity.
 
     Renders only what the renderable hands it: the heading, any warnings, and either
     the picker form or an explanation of why there is nothing to play.
@@ -74,12 +74,12 @@
         ]
     }
 }}
-<div class="suddendeath-picker">
+<div class="onelife-picker">
 
-    <h2 class="suddendeath-picker__title">{{name}}</h2>
+    <h2 class="onelife-picker__title">{{name}}</h2>
 
     {{#haswarnings}}
-        <div class="suddendeath-picker__warnings" role="status">
+        <div class="onelife-picker__warnings" role="status">
             {{#warnings}}
                 <div class="alert alert-warning" role="alert">{{message}}</div>
             {{/warnings}}
@@ -87,40 +87,40 @@
     {{/haswarnings}}
 
     {{#hasnotice}}
-        <div class="suddendeath-picker__notice alert alert-info" role="alert">{{notice}}</div>
+        <div class="onelife-picker__notice alert alert-info" role="alert">{{notice}}</div>
     {{/hasnotice}}
 
     {{^hasnotice}}
-        <div class="suddendeath-picker__form">
+        <div class="onelife-picker__form">
             {{{formhtml}}}
         </div>
     {{/hasnotice}}
 
-    <section class="suddendeath-records">
-        <h3 class="suddendeath-records__heading">{{#str}} personalrecords, mod_suddendeath {{/str}}</h3>
+    <section class="onelife-records">
+        <h3 class="onelife-records__heading">{{#str}} personalrecords, mod_onelife {{/str}}</h3>
 
         {{^hasrecords}}
-            <p class="suddendeath-records__none">{{#str}} norecordsyet, mod_suddendeath {{/str}}</p>
+            <p class="onelife-records__none">{{#str}} norecordsyet, mod_onelife {{/str}}</p>
         {{/hasrecords}}
 
         {{#hasrecords}}
-            <table class="table table-sm suddendeath-records__table">
-                <caption class="sr-only visually-hidden">{{#str}} personalrecords, mod_suddendeath {{/str}}</caption>
+            <table class="table table-sm onelife-records__table">
+                <caption class="sr-only visually-hidden">{{#str}} personalrecords, mod_onelife {{/str}}</caption>
                 <thead>
                     <tr>
-                        <th scope="col">{{#str}} recordscope, mod_suddendeath {{/str}}</th>
-                        <th scope="col">{{#str}} recordbest, mod_suddendeath {{/str}}</th>
-                        <th scope="col">{{#str}} recordlast, mod_suddendeath {{/str}}</th>
-                        <th scope="col">{{#str}} recordruns, mod_suddendeath {{/str}}</th>
+                        <th scope="col">{{#str}} recordscope, mod_onelife {{/str}}</th>
+                        <th scope="col">{{#str}} recordbest, mod_onelife {{/str}}</th>
+                        <th scope="col">{{#str}} recordlast, mod_onelife {{/str}}</th>
+                        <th scope="col">{{#str}} recordruns, mod_onelife {{/str}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#records}}
                         <tr>
-                            <th scope="row" class="suddendeath-records__scope">{{scope}}</th>
-                            <td class="suddendeath-records__best">{{beststreak}}</td>
-                            <td class="suddendeath-records__last">{{laststreak}} <small>{{lasttime}}</small></td>
-                            <td class="suddendeath-records__runs">{{totalruns}}</td>
+                            <th scope="row" class="onelife-records__scope">{{scope}}</th>
+                            <td class="onelife-records__best">{{beststreak}}</td>
+                            <td class="onelife-records__last">{{laststreak}} <small>{{lasttime}}</small></td>
+                            <td class="onelife-records__runs">{{totalruns}}</td>
                         </tr>
                     {{/records}}
                 </tbody>
