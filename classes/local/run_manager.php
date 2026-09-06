@@ -24,7 +24,10 @@
 
 namespace mod_suddendeath\local;
 
+use context_module;
 use mod_suddendeath\engine;
+use mod_suddendeath\event\run_finished;
+use mod_suddendeath\event\run_started;
 use stdClass;
 
 /**
@@ -124,6 +127,10 @@ class run_manager {
         $run->timecreated = time();
         $run->timefinish = null;
         $run->id = $DB->insert_record('suddendeath_run', $run);
+
+        // Only this branch fires. Resuming returned above, so a refresh cannot make
+        // the same run look like a second start in the logs.
+        $this->fire_run_started($run);
 
         return $run;
     }
@@ -228,6 +235,12 @@ class run_manager {
         $result->correctanswerid = $scored->correctanswerid;
         $result->explanation = engine::extract_explanation((string) $question->generalfeedback);
 
+        // The call to apply_answer_outcome() above has just closed the run, and a run
+        // that was already closed was refused earlier, so this fires exactly once.
+        if ($result->finished) {
+            $this->fire_run_finished($current, $result->streak);
+        }
+
         return $result;
     }
 
@@ -243,6 +256,15 @@ class run_manager {
     public function finish(stdClass $run): stdClass {
         global $DB;
 
+        // Read the stored state rather than trusting the passed object, which came
+        // from a rendered page. Closing an already closed run must not fire a second
+        // run_finished.
+        $wasopen = $DB->record_exists_select(
+            'suddendeath_run',
+            'id = ? AND timefinish IS NULL',
+            [$run->id]
+        );
+
         $update = new stdClass();
         $update->id = $run->id;
         $update->timefinish = time();
@@ -251,6 +273,10 @@ class run_manager {
 
         $run->timefinish = $update->timefinish;
         $run->currentquestionid = null;
+
+        if ($wasopen) {
+            $this->fire_run_finished($run, (int) $run->streak);
+        }
 
         return $run;
     }
@@ -357,6 +383,72 @@ class run_manager {
                  WHERE qv.questionid = ?";
 
         return (int) $DB->get_field_sql($sql, [$question->id], IGNORE_MULTIPLE);
+    }
+
+    /**
+     * Fire run_started for a newly created run.
+     *
+     * @param stdClass $run the run as stored
+     */
+    protected function fire_run_started(stdClass $run): void {
+        $context = $this->context_of($run);
+        if ($context === null) {
+            return;
+        }
+
+        run_started::create([
+            'objectid' => (int) $run->id,
+            'context' => $context,
+            'relateduserid' => (int) $run->userid,
+            'other' => [
+                'scopetype' => (string) $run->scopetype,
+                'topicids' => (string) $run->topicids,
+            ],
+        ])->trigger();
+    }
+
+    /**
+     * Fire run_finished for a run that has just closed.
+     *
+     * The streak is passed in rather than read from the row, because the caller in
+     * answer() already knows the value it wrote and re-reading would cost a query for
+     * a number that cannot have changed.
+     *
+     * @param stdClass $run the run
+     * @param int $streak the streak the learner finished on
+     */
+    protected function fire_run_finished(stdClass $run, int $streak): void {
+        $context = $this->context_of($run);
+        if ($context === null) {
+            return;
+        }
+
+        run_finished::create([
+            'objectid' => (int) $run->id,
+            'context' => $context,
+            'relateduserid' => (int) $run->userid,
+            'other' => [
+                'streak' => $streak,
+                'scopetype' => (string) $run->scopetype,
+                'topicids' => (string) $run->topicids,
+            ],
+        ])->trigger();
+    }
+
+    /**
+     * The module context a run belongs to.
+     *
+     * Returns null when the activity has no course module, which happens while an
+     * instance is being deleted. Losing an event there is preferable to throwing in
+     * the middle of a delete.
+     *
+     * @param stdClass $run the run
+     * @return context_module|null the context, or null when there is no course module
+     */
+    protected function context_of(stdClass $run): ?context_module {
+        $cm = get_coursemodule_from_instance('suddendeath', (int) $run->suddendeathid, 0, false, IGNORE_MISSING);
+
+        return $cm ? context_module::instance($cm->id) : null;
     }
 
     /**

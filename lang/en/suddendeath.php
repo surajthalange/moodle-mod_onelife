@@ -51,6 +51,8 @@ $string['errnotopicsinbank'] = 'This activity has no topics to practise yet.';
 $string['errtargetstreak'] = 'Enter a whole number of 1 or more.';
 $string['errtopicbank'] = 'That topic bank is not available to this course. Choose another, or use auto-detect.';
 $string['errunknowntopic'] = 'That topic is not part of this activity.';
+$string['eventrunfinished'] = 'Run finished';
+$string['eventrunstarted'] = 'Run started';
 $string['explanationconvention'] = 'Explanations in question feedback';
 $string['explanationconvention_help'] = 'After each answer, Sudden Death shows the learner an explanation taken from the question\'s general feedback.
 
