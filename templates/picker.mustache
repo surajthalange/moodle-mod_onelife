@@ -74,7 +74,7 @@
         ]
     }
 }}
-<div class="onelife-picker">
+<div class="onelife-app onelife-picker">
 
     <h2 class="onelife-picker__title">{{name}}</h2>
 
@@ -90,42 +90,46 @@
         <div class="onelife-picker__notice alert alert-info" role="alert">{{notice}}</div>
     {{/hasnotice}}
 
-    {{^hasnotice}}
-        <div class="onelife-picker__form">
-            {{{formhtml}}}
-        </div>
-    {{/hasnotice}}
+    <div class="onelife-picker__layout">
 
-    <section class="onelife-records">
-        <h3 class="onelife-records__heading">{{#str}} personalrecords, mod_onelife {{/str}}</h3>
+        {{^hasnotice}}
+            <div class="onelife-picker__form">
+                {{{formhtml}}}
+            </div>
+        {{/hasnotice}}
 
-        {{^hasrecords}}
-            <p class="onelife-records__none">{{#str}} norecordsyet, mod_onelife {{/str}}</p>
-        {{/hasrecords}}
+        <section class="onelife-records">
+            <h3 class="onelife-records__heading">{{#str}} personalrecords, mod_onelife {{/str}}</h3>
 
-        {{#hasrecords}}
-            <table class="table table-sm onelife-records__table">
-                <caption class="sr-only visually-hidden">{{#str}} personalrecords, mod_onelife {{/str}}</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">{{#str}} recordscope, mod_onelife {{/str}}</th>
-                        <th scope="col">{{#str}} recordbest, mod_onelife {{/str}}</th>
-                        <th scope="col">{{#str}} recordlast, mod_onelife {{/str}}</th>
-                        <th scope="col">{{#str}} recordruns, mod_onelife {{/str}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#records}}
+            {{^hasrecords}}
+                <p class="onelife-records__none">{{#str}} norecordsyet, mod_onelife {{/str}}</p>
+            {{/hasrecords}}
+
+            {{#hasrecords}}
+                <table class="table table-sm onelife-records__table">
+                    <caption class="sr-only visually-hidden">{{#str}} personalrecords, mod_onelife {{/str}}</caption>
+                    <thead>
                         <tr>
-                            <th scope="row" class="onelife-records__scope">{{scope}}</th>
-                            <td class="onelife-records__best">{{beststreak}}</td>
-                            <td class="onelife-records__last">{{laststreak}} <small>{{lasttime}}</small></td>
-                            <td class="onelife-records__runs">{{totalruns}}</td>
+                            <th scope="col">{{#str}} recordscope, mod_onelife {{/str}}</th>
+                            <th scope="col">{{#str}} recordbest, mod_onelife {{/str}}</th>
+                            <th scope="col">{{#str}} recordlast, mod_onelife {{/str}}</th>
+                            <th scope="col">{{#str}} recordruns, mod_onelife {{/str}}</th>
                         </tr>
-                    {{/records}}
-                </tbody>
-            </table>
-        {{/hasrecords}}
-    </section>
+                    </thead>
+                    <tbody>
+                        {{#records}}
+                            <tr>
+                                <th scope="row" class="onelife-records__scope">{{scope}}</th>
+                                <td class="onelife-records__best">{{beststreak}}</td>
+                                <td class="onelife-records__last">{{laststreak}} <small>{{lasttime}}</small></td>
+                                <td class="onelife-records__runs">{{totalruns}}</td>
+                            </tr>
+                        {{/records}}
+                    </tbody>
+                </table>
+            {{/hasrecords}}
+        </section>
+
+    </div>
 
 </div>

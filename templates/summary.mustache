@@ -56,31 +56,60 @@
         "sesskey": "abc123"
     }
 }}
-<div class="onelife-summary">
+<div class="onelife-app onelife-summary">
 
     <h3 class="onelife-summary__heading">{{#str}} runover, mod_onelife {{/str}}</h3>
 
-    <p class="onelife-summary__score" role="status">
+    {{! The hero numeral is a decorative duplicate of the sentence below it, so it is
+        hidden from assistive technology rather than read twice. }}
+    <p class="onelife-summary__hero" aria-hidden="true">{{streak}}</p>
+
+    <p class="onelife-summary__herolabel" role="status">
         {{#str}} finalstreak, mod_onelife, {{streak}} {{/str}}
         <span class="onelife-summary__percent">{{percent}}%</span>
     </p>
+
+    {{! Decorative: both the streak and the percentage are already text above. }}
+    <div class="onelife-summary__bar" aria-hidden="true">
+        <div class="onelife-summary__barfill" style="width: {{percent}}%"></div>
+    </div>
 
     {{#exhausted}}
         <div class="alert alert-info onelife-summary__exhausted" role="alert">{{exhaustedmessage}}</div>
     {{/exhausted}}
 
+    {{! One panel in every case. Mustache has no "or", so the three combinations are
+        spelled out: the correct answer is only meaningful when the run ended on a
+        wrong answer, but the explanation is shown whenever there is one, including
+        when the pool ran out. }}
     {{^exhausted}}
         {{#hascorrectanswer}}
-            <p class="onelife-summary__correct">
-                {{#str}} thecorrectanswerwas, mod_onelife {{/str}}
-                <strong>{{correctanswer}}</strong>
-            </p>
+            <div class="onelife-summary__panel">
+                <p class="onelife-summary__correct">
+                    {{#str}} thecorrectanswerwas, mod_onelife {{/str}}
+                    <strong class="onelife-summary__correctanswer">{{correctanswer}}</strong>
+                </p>
+                {{#hasexplanation}}
+                    <div class="onelife-summary__explanation">{{{explanation}}}</div>
+                {{/hasexplanation}}
+            </div>
+        {{/hascorrectanswer}}
+        {{^hascorrectanswer}}
+            {{#hasexplanation}}
+                <div class="onelife-summary__panel">
+                    <div class="onelife-summary__explanation">{{{explanation}}}</div>
+                </div>
+            {{/hasexplanation}}
         {{/hascorrectanswer}}
     {{/exhausted}}
 
-    {{#hasexplanation}}
-        <div class="onelife-summary__explanation">{{{explanation}}}</div>
-    {{/hasexplanation}}
+    {{#exhausted}}
+        {{#hasexplanation}}
+            <div class="onelife-summary__panel">
+                <div class="onelife-summary__explanation">{{{explanation}}}</div>
+            </div>
+        {{/hasexplanation}}
+    {{/exhausted}}
 
     <p class="onelife-summary__actions">
         <a href="{{{config.wwwroot}}}/mod/onelife/view.php?id={{cmid}}" class="btn btn-primary">

@@ -8,7 +8,7 @@ from a course's question bank.
 - **Component:** `mod_onelife`
 - **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2
 - **Licence:** GPLv3 or later
-- **Status:** alpha, scaffold only — not yet playable
+- **Status:** feature complete for v1.0 except Behat coverage
 
 ## What it does
 

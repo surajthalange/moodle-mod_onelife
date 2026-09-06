@@ -61,6 +61,11 @@ class scope_picker_form extends moodleform {
         $mform->addElement('hidden', 'id', $this->_customdata['cmid']);
         $mform->setType('id', PARAM_INT);
 
+        // Group elements are separated with an empty string rather than <br>. Moodle
+        // core ships ".mform .d-flex br + label { width: 100% }", which is how it
+        // stacks <br>-separated group items, and that selector still matches when the
+        // <br> is hidden with CSS because adjacency does not care about display. The
+        // separator has to go, not be hidden, for the options to lay out as cards.
         $moderadios = [];
         foreach ($allowedmodes as $code) {
             $moderadios[] = $mform->createElement(
@@ -75,7 +80,7 @@ class scope_picker_form extends moodleform {
             $moderadios,
             'scopetypegroup',
             get_string('choosescope', 'mod_onelife'),
-            ['<br />'],
+            [''],
             false
         );
         $mform->setDefault('scopetype', reset($allowedmodes));
@@ -95,7 +100,7 @@ class scope_picker_form extends moodleform {
                 $topicradios,
                 'singletopicgroup',
                 get_string('choosetopic', 'mod_onelife'),
-                ['<br />'],
+                [''],
                 false
             );
             // Named elements, never bare integers, so this dependency actually binds.
@@ -116,7 +121,7 @@ class scope_picker_form extends moodleform {
                 $topicboxes,
                 scope_validator::TOPIC_GROUP,
                 get_string('choosetopics', 'mod_onelife'),
-                ['<br />'],
+                [''],
                 false
             );
             $mform->hideIf(scope_validator::TOPIC_GROUP, 'scopetype', 'neq', modes::MULTI);

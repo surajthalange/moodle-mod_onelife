@@ -1,27 +1,91 @@
 /* Styles for mod_onelife.
  *
- * Self-contained: this file assumes no other plugin's stylesheet is loaded.
- * Every selector is scoped to this module's body id or to a onelife- prefixed
- * class, so nothing here can leak into the rest of the site.
+ * Self-contained: this file assumes no other plugin's stylesheet is loaded. Every
+ * selector is scoped to this module's body id or to an onelife- prefixed class, so
+ * nothing here can leak into the rest of the site.
  *
- * Colours come from Moodle's theme custom properties with a plain fallback, so the
- * activity inherits the site theme instead of fighting it.
+ * Colours come from the theme's own custom properties, never hardcoded. The chain is
+ * var(--bs-x, var(--x, literal)): Bootstrap 5 on Moodle 5.x publishes --bs-*,
+ * Bootstrap 4 on Moodle 4.5 publishes the unprefixed names for a few of them, and the
+ * literal is the last resort. A theme that recolours itself recolours this activity.
+ *
+ * No !important anywhere: Moodle's stylelint config sets declaration-no-important,
+ * and specificity is enough because everything is nested under a plugin class.
  */
 
-#page-mod-onelife-view .onelife-picker {
-    margin-bottom: 1.5rem;
+/* ---------------------------------------------------------------------------
+ * Design tokens.
+ *
+ * One 1.25 type scale from a 1rem base, so the activity rides the theme's root
+ * font size rather than pinning pixels, and a 4px spacing rhythm. Every margin,
+ * padding and gap below uses these, so the vertical rhythm cannot drift.
+ * --------------------------------------------------------------------------- */
+.onelife-app {
+    --ol-accent: var(--bs-primary, var(--primary, #0f6cbf));
+    --ol-surface: var(--bs-body-bg, #fff);
+    --ol-sunken: var(--bs-tertiary-bg, #f5f6f8);
+    --ol-border: var(--bs-border-color, #dee2e6);
+    --ol-muted: var(--bs-secondary-color, #5c6670);
+    --ol-good: var(--bs-success, var(--success, #357a32));
+    --ol-space-1: 0.25rem;
+    --ol-space-2: 0.5rem;
+    --ol-space-3: 0.75rem;
+    --ol-space-4: 1rem;
+    --ol-space-5: 1.5rem;
+    --ol-space-6: 2rem;
+    --ol-space-8: 3rem;
+    --ol-step-0: 0.8rem;
+    --ol-step-1: 1rem;
+    --ol-step-2: 1.25rem;
+    --ol-step-3: 1.563rem;
+    --ol-step-4: 1.953rem;
+    --ol-radius: 0.5rem;
+    --ol-radius-sm: 0.25rem;
 }
 
-#page-mod-onelife-view .onelife-picker__title {
-    margin-bottom: 1rem;
+/* ---------------------------------------------------------------------------
+ * Picker.
+ * --------------------------------------------------------------------------- */
+.onelife-picker__title {
+    font-size: var(--ol-step-4);
+    line-height: 1.2;
+    margin-bottom: var(--ol-space-5);
 }
 
-#page-mod-onelife-view .onelife-picker__warnings {
-    margin-bottom: 1rem;
+.onelife-picker__warnings {
+    margin-bottom: var(--ol-space-4);
 }
 
-#page-mod-onelife-view .onelife-picker__notice {
-    border-left: 4px solid var(--primary, #0f6cbf);
+.onelife-picker__notice {
+    border-left: 4px solid var(--ol-accent);
+}
+
+/* Form beside records on wide screens, stacked on narrow. auto-fit rather than
+ * breakpoint-specific column rules, so there is one layout declaration to maintain.
+ */
+.onelife-picker__layout {
+    display: grid;
+    gap: var(--ol-space-6);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 62rem) {
+    .onelife-picker__layout {
+        grid-template-columns: minmax(0, 3fr) minmax(16rem, 1fr);
+    }
+}
+
+/* Stack each form row: label above, options below, both full width.
+ *
+ * formslib splits every row into a col-md-3 label and a col-md-9 field. Inside an
+ * activity page that leaves the options about a third of the screen, which is not
+ * enough for cards. These are Bootstrap grid classes rather than utilities, so
+ * unlike .d-flex they carry no !important and can simply be outweighed.
+ */
+.onelife-picker .fitem > div {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
 }
 
 /* The picker's option rows.
@@ -32,45 +96,441 @@
  * first row's content sat centred while the rows themselves were never indented.
  * Declaring it here means an inherited rule cannot reintroduce that.
  */
-#page-mod-onelife-view .onelife-picker .fitem .felement > div,
-#page-mod-onelife-view .onelife-picker__row {
+.onelife-picker .fitem .felement > div,
+.onelife-picker__row {
+    justify-content: flex-start;
+}
+
+.onelife-picker .fitem .felement > div:first-child,
+.onelife-picker__row:first-child {
+    justify-content: flex-start;
+}
+
+.onelife-picker fieldset {
+    border: 0;
+    margin: 0 0 var(--ol-space-4);
+    padding: 0;
+    width: 100%;
+}
+
+.onelife-picker legend {
+    font-size: var(--ol-step-1);
+    font-weight: 600;
+    width: auto;
+}
+
+/* The visible group label formslib renders alongside the hidden legend. */
+.onelife-picker .col-form-label p {
+    font-size: var(--ol-step-1);
+    font-weight: 600;
+}
+
+/* Lay the options of a group out as a wrapping row of cards.
+ *
+ * The container already carries Bootstrap's .d-flex.flex-wrap, and Bootstrap 5
+ * generates its utilities with !important, which this file may not outbid because
+ * Moodle's stylelint sets declaration-no-important. So the container's display is
+ * left alone and the cards are sized as flex items instead. gap is not part of the
+ * utility, so it can be set here.
+ *
+ * :has() is the only way to reach a label from the input inside it. Where it is not
+ * supported these rules simply do not apply and formslib's own radio list is what
+ * renders, which is still complete and operable. Nothing essential depends on this
+ * file.
+ */
+.onelife-picker fieldset > div:has(input[name="singletopic"]),
+.onelife-picker fieldset > div:has(input[name^="topic_"]) {
+    gap: var(--ol-space-3);
+}
+
+/* Topic cards.
+ *
+ * The label is the card and it wraps its own native input, which is what Moodle
+ * renders already. No element is invented, nothing is given a click handler, and
+ * "exactly one" for single mode comes from the radio group rather than from script.
+ *
+ * The control stays visible here on purpose. A learner scanning eight topics needs
+ * to see which are ticked without decoding a colour, and a visible native control
+ * keeps working under forced-colours and high-contrast settings.
+ */
+.onelife-picker label:has(input[name="singletopic"]),
+.onelife-picker label:has(input[name^="topic_"]) {
+    align-items: flex-start;
+    background-color: var(--ol-surface);
+    border: 1px solid var(--ol-border);
+    border-left: 3px solid transparent;
+    border-radius: var(--ol-radius);
+    cursor: pointer;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: baseline;
+    flex: 1 1 12rem;
+    gap: var(--ol-space-3);
+    margin: 0;
+    min-height: 3rem;
+    padding: var(--ol-space-3) var(--ol-space-4);
+    transition: border-color 0.12s ease-out, transform 0.12s ease-out;
+    width: auto;
 }
 
-#page-mod-onelife-view .onelife-picker .fitem .felement > div:first-child,
-#page-mod-onelife-view .onelife-picker__row:first-child {
-    justify-content: flex-start;
+.onelife-picker label:has(input[name="singletopic"]) input,
+.onelife-picker label:has(input[name^="topic_"]) input {
+    flex: 0 0 auto;
+    margin: 0;
+    accent-color: var(--ol-accent);
 }
 
-/* Give radio and checkbox labels a comfortable target without changing their
- * semantics: these stay real labels tied to real inputs.
+/* Hover and focus are deliberately different from each other, and neither is the
+ * selected treatment. Hover moves, focus rings, selection changes shape and weight.
  */
-#page-mod-onelife-view .onelife-picker .form-check-inline,
-#page-mod-onelife-view .onelife-picker label {
-    margin-bottom: 0.35rem;
-    line-height: 1.5;
+.onelife-picker label:has(input[name="singletopic"]):hover,
+.onelife-picker label:has(input[name^="topic_"]):hover {
+    border-color: var(--ol-accent);
+    transform: translateY(-1px);
 }
 
-/* Keep the keyboard focus ring visible. Removing outlines is the single most
- * common way a picker like this becomes unusable without a mouse.
- */
-#page-mod-onelife-view .onelife-picker input:focus-visible,
-#page-mod-onelife-view .onelife-picker button:focus-visible {
-    outline: 2px solid var(--primary, #0f6cbf);
+.onelife-picker label:has(input:focus-visible) {
+    outline: 2px solid var(--ol-accent);
     outline-offset: 2px;
 }
 
-#page-mod-onelife-view .onelife-picker fieldset {
+/* Selected: an inset edge, a heavier weight and a tick. Three signals, none of them
+ * hue alone, so the state survives colour vision deficiency, greyscale printing and
+ * forced-colours mode.
+ */
+.onelife-picker label:has(input[name="singletopic"]:checked),
+.onelife-picker label:has(input[name^="topic_"]:checked) {
+    border-left-color: var(--ol-accent);
+    font-weight: 600;
+}
+
+.onelife-picker label:has(input[name="singletopic"]:checked)::after,
+.onelife-picker label:has(input[name^="topic_"]:checked)::after {
+    color: var(--ol-accent);
+    content: "\2713";
+    font-weight: 700;
+    margin-left: auto;
+}
+
+/* Mode choice as a segmented control.
+ *
+ * Here the native control is clipped rather than shown, because a segmented control
+ * with three visible radios reads as a list, not a switch. Clip keeps the input
+ * focusable and in the accessibility tree; display:none would remove both.
+ */
+.onelife-picker fieldset > div:has(input[name="scopetype"]) {
+    background-color: var(--ol-sunken);
+    border: 1px solid var(--ol-border);
+    border-radius: var(--ol-radius);
+    gap: var(--ol-space-1);
+    padding: var(--ol-space-1);
+    width: fit-content;
+}
+
+.onelife-picker label:has(input[name="scopetype"]) {
+    border-radius: var(--ol-radius-sm);
+    cursor: pointer;
+    flex: 0 1 auto;
+    margin: 0;
+    padding: var(--ol-space-2) var(--ol-space-4);
+    transition: background-color 0.12s ease-out;
+    width: auto;
+}
+
+.onelife-picker label:has(input[name="scopetype"]) input {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+.onelife-picker label:has(input[name="scopetype"]):hover {
+    background-color: var(--ol-surface);
+}
+
+.onelife-picker label:has(input[name="scopetype"]:checked) {
+    background-color: var(--ol-surface);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    font-weight: 600;
+}
+
+/* The selected segment also gets an underline, so the state is not carried by the
+ * raised surface alone.
+ */
+.onelife-picker label:has(input[name="scopetype"]:checked)::after {
+    background-color: var(--ol-accent);
+    content: "";
+    display: block;
+    height: 2px;
+    margin-top: var(--ol-space-1);
+}
+
+/* ---------------------------------------------------------------------------
+ * Records.
+ * --------------------------------------------------------------------------- */
+.onelife-records__heading {
+    font-size: var(--ol-step-2);
+    margin-bottom: var(--ol-space-3);
+}
+
+/* The records stay a real table: four values per scope, compared across rows, with
+ * column and row headers a screen reader can use. Styling it to look like a set of
+ * cards would mean giving up those associations, which is a poor trade for looks.
+ */
+.onelife-records__table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.onelife-records__table th,
+.onelife-records__table td {
     border: 0;
-    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--ol-border);
+    padding: var(--ol-space-3) var(--ol-space-2);
+    vertical-align: baseline;
+}
+
+.onelife-records__table thead th {
+    color: var(--ol-muted);
+    font-size: var(--ol-step-0);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* The personal best is the reason to play again, so it carries the emphasis. */
+.onelife-records__best {
+    color: var(--ol-accent);
+    font-size: var(--ol-step-3);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.onelife-records__scope {
+    font-weight: 600;
+}
+
+.onelife-records__last,
+.onelife-records__runs {
+    color: var(--ol-muted);
+    font-size: var(--ol-step-0);
+    font-variant-numeric: tabular-nums;
+}
+
+.onelife-records__none {
+    color: var(--ol-muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * Play.
+ * --------------------------------------------------------------------------- */
+.onelife-play {
+    margin: 0 auto;
+    max-width: 44rem;
+}
+
+.onelife-play__streak {
+    align-items: baseline;
+    background-color: var(--ol-sunken);
+    border-radius: var(--ol-radius);
+    display: flex;
+    gap: var(--ol-space-2);
+    justify-content: center;
+    margin: 0 auto var(--ol-space-5);
+    padding: var(--ol-space-2) var(--ol-space-5);
+    width: fit-content;
+}
+
+.onelife-play__streaknumber {
+    color: var(--ol-accent);
+    font-size: var(--ol-step-3);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.onelife-play__streaklabel {
+    color: var(--ol-muted);
+    font-size: var(--ol-step-0);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* The question is the thing being read, so it gets the size and the measure. */
+.onelife-play__questiontext {
+    font-size: var(--ol-step-3);
+    line-height: 1.35;
+    margin: 0 auto var(--ol-space-6);
+    max-width: 34em;
+    text-align: center;
+}
+
+.onelife-play__answers {
+    display: grid;
+    gap: var(--ol-space-3);
+}
+
+/* Full-width answer targets. These are real submit buttons, one per answer, so a
+ * run needs one click and no script.
+ */
+/* Bootstrap's .btn sets text-align:center and ties with a single class, so the
+ * answer rule carries the block class too in order to win on specificity rather
+ * than on source order.
+ */
+.onelife-play .onelife-play__answer {
+    font-size: var(--ol-step-1);
+    min-height: 3.25rem;
+    padding: var(--ol-space-3) var(--ol-space-4);
+    text-align: left;
+    white-space: normal;
+    width: 100%;
+}
+
+.onelife-play__answer:focus-visible {
+    outline: 2px solid var(--ol-accent);
+    outline-offset: 2px;
+}
+
+.onelife-play__question {
+    border: 0;
+    margin: 0;
     padding: 0;
 }
 
-#page-mod-onelife-view .onelife-picker legend {
-    font-size: 1rem;
+/* ---------------------------------------------------------------------------
+ * Summary. The streak number is the hero and is deliberately off the type scale;
+ * nothing else on this screen competes with it.
+ * --------------------------------------------------------------------------- */
+.onelife-summary {
+    margin: 0 auto;
+    max-width: 40rem;
+    text-align: center;
+}
+
+.onelife-summary__heading {
+    color: var(--ol-muted);
+    font-size: var(--ol-step-1);
     font-weight: 600;
-    width: auto;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--ol-space-2);
+    text-transform: uppercase;
+}
+
+.onelife-summary__hero {
+    color: var(--ol-accent);
+    font-size: clamp(4rem, 18vw, 9rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin: 0;
+}
+
+.onelife-summary__herolabel {
+    color: var(--ol-muted);
+    font-size: var(--ol-step-1);
+    margin-bottom: var(--ol-space-5);
+}
+
+/* Decorative only. The number and the percentage are both already text, so the bar
+ * is hidden from assistive technology instead of being given a role it would have
+ * to fake.
+ */
+.onelife-summary__bar {
+    background-color: var(--ol-sunken);
+    border-radius: var(--ol-radius-sm);
+    height: 0.5rem;
+    margin: 0 auto var(--ol-space-5);
+    max-width: 22rem;
+    overflow: hidden;
+}
+
+.onelife-summary__barfill {
+    background-color: var(--ol-accent);
+    height: 100%;
+}
+
+.onelife-summary__panel {
+    background-color: var(--ol-sunken);
+    border-radius: var(--ol-radius);
+    margin-bottom: var(--ol-space-5);
+    padding: var(--ol-space-4);
+    text-align: left;
+}
+
+.onelife-summary__correct {
+    margin-bottom: var(--ol-space-2);
+}
+
+.onelife-summary__correctanswer {
+    color: var(--ol-good);
+    font-weight: 700;
+}
+
+.onelife-summary__explanation {
+    color: var(--ol-muted);
+}
+
+.onelife-summary__actions {
+    margin: 0;
+}
+
+.onelife-summary__actions .btn:focus-visible {
+    outline: 2px solid var(--ol-accent);
+    outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Narrow screens. Moodle is used heavily on phones, so the touch targets grow
+ * rather than shrink and every grid collapses to one column.
+ * --------------------------------------------------------------------------- */
+@media (max-width: 36rem) {
+    .onelife-picker label:has(input[name="singletopic"]),
+    .onelife-picker label:has(input[name^="topic_"]) {
+        flex: 1 1 100%;
+    }
+
+    .onelife-picker fieldset > div:has(input[name="scopetype"]) {
+        width: 100%;
+    }
+
+    .onelife-picker label:has(input[name="scopetype"]) {
+        flex: 1 1 auto;
+        min-height: 2.75rem;
+        text-align: center;
+    }
+
+    .onelife-play__answer {
+        min-height: 3.5rem;
+    }
+
+    .onelife-records__item {
+        flex-wrap: wrap;
+    }
+}
+
+/* Respect a stated preference for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    .onelife-picker label {
+        transition: none;
+    }
+
+    .onelife-picker label:hover {
+        transform: none;
+    }
+}
+
+/* Under forced colours the theme's palette is replaced, so selection is restated
+ * with a border, which forced-colours mode preserves.
+ */
+@media (forced-colors: active) {
+    .onelife-picker label:has(input:checked) {
+        border: 2px solid;
+    }
+
+    .onelife-summary__barfill {
+        background-color: Highlight;
+    }
 }

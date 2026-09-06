@@ -115,6 +115,7 @@ $string['resetruns'] = 'Delete all runs and answers';
 $string['runover'] = 'Run over';
 $string['runsdeleted'] = 'Runs and answers deleted';
 $string['startrun'] = 'Start';
+$string['streaklabel'] = 'Streak';
 $string['streaksofar'] = 'Streak: {$a}';
 $string['targetstreak'] = 'Target streak';
 $string['targetstreak_help'] = 'The streak that counts as 100% in the run summary.

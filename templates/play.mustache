@@ -58,10 +58,19 @@
         ]
     }
 }}
-<div class="onelife-play">
+<div class="onelife-app onelife-play">
 
+    {{! The streak stays visible and prominent throughout the run. The numeral is a
+        decorative duplicate at display size; the sentence beside it carries the
+        meaning, so a screen reader hears it once and correctly. }}
     <p class="onelife-play__streak" role="status">
-        {{#str}} streaksofar, mod_onelife, {{streak}} {{/str}}
+        <span class="onelife-play__streaknumber" aria-hidden="true">{{streak}}</span>
+        <span class="onelife-play__streaklabel" aria-hidden="true">
+            {{#str}} streaklabel, mod_onelife {{/str}}
+        </span>
+        <span class="sr-only visually-hidden">
+            {{#str}} streaksofar, mod_onelife, {{streak}} {{/str}}
+        </span>
     </p>
 
     <form method="post" action="{{{config.wwwroot}}}/mod/onelife/play.php" class="onelife-play__form">
