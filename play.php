@@ -27,6 +27,7 @@
  */
 
 require('../../config.php');
+require_once($CFG->libdir . '/completionlib.php');
 
 use mod_suddendeath\local\run_manager;
 use mod_suddendeath\output\play_page;
@@ -77,7 +78,14 @@ if ($answerid > 0 && confirm_sesskey()) {
         redirect($playurl, get_string('answerrefused', 'mod_suddendeath'), null, \core\output\notification::NOTIFY_INFO);
     }
 
-    if (!$outcome->finished) {
+    if ($outcome->finished) {
+        // Completion is re-evaluated when a run ends, not on every page view: the
+        // streak rule can only change at the moment a run closes.
+        $completion = new completion_info($course);
+        if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC) {
+            $completion->update_state($cm, COMPLETION_UNKNOWN, (int) $USER->id);
+        }
+    } else {
         // Post/redirect/get, so a refresh cannot resubmit the answer.
         redirect($playurl);
     }

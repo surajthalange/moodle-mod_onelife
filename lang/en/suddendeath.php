@@ -37,6 +37,7 @@ $string['chooseananswer'] = 'Choose an answer';
 $string['choosescope'] = 'What would you like to practise?';
 $string['choosetopic'] = 'Choose a topic';
 $string['choosetopics'] = 'Choose one or more topics';
+$string['completiondetail:streak'] = 'Reach a streak of {$a}';
 $string['completionstreak'] = 'Learner must reach a streak of';
 $string['completionstreak_help'] = 'When set, the activity is marked complete once the learner reaches this streak in a single run. Leave it blank, or set it to 0, to disable the rule.';
 $string['completionstreakgroup'] = 'Reach a streak';

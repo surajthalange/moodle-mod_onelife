@@ -90,6 +90,40 @@ function suddendeath_update_instance($moduleinstance, $mform = null) {
 }
 
 /**
+ * Course module information, including the custom completion rules.
+ *
+ * Registering the rule here is what makes it visible to core: the completion API
+ * only evaluates rules that appear in customdata, and it filters out any whose
+ * value is empty. A completionstreak of 0 therefore disables the rule without any
+ * extra handling.
+ *
+ * @param stdClass $coursemodule the course module
+ * @return cached_cm_info|false the info, or false when the instance is missing
+ */
+function suddendeath_get_coursemodule_info($coursemodule) {
+    global $DB;
+
+    $fields = 'id, name, intro, introformat, completionstreak';
+    $instance = $DB->get_record('suddendeath', ['id' => $coursemodule->instance], $fields);
+    if (!$instance) {
+        return false;
+    }
+
+    $info = new cached_cm_info();
+    $info->name = $instance->name;
+
+    if ($coursemodule->showdescription) {
+        $info->content = format_module_intro('suddendeath', $instance, $coursemodule->id, false);
+    }
+
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $info->customdata['customcompletionrules']['completionstreak'] = (int) $instance->completionstreak;
+    }
+
+    return $info;
+}
+
+/**
  * Delete a Sudden Death instance along with every run and answer belonging to it.
  *
  * @param int $id id of the instance to remove
