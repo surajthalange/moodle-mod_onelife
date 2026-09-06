@@ -45,10 +45,11 @@ function suddendeath_supports($feature) {
             return false;
         case FEATURE_GRADE_OUTCOMES:
             return false;
-        // False until backup/moodle2/ exists (PRD build step 8). Returning true without the
-        // backup classes makes the course-module delete path throw.
+        // True now that backup/moodle2/ holds all four classes. Claiming true without
+        // them makes the course-module delete path throw, which is why this stayed
+        // false until they existed.
         case FEATURE_BACKUP_MOODLE2:
-            return false;
+            return true;
         case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_INTERACTIVECONTENT;
         default:
