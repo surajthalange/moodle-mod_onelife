@@ -418,14 +418,31 @@
     text-transform: uppercase;
 }
 
+/* Sized in steps rather than with clamp(). The csstree validator behind Moodle's
+ * stylelint rejects clamp() as a font-size value, and CI is the only place that
+ * check runs, so this is deliberate rather than a stylistic preference. Three
+ * explicit steps give the same effect and are legible in the cascade.
+ */
 .onelife-summary__hero {
     color: var(--ol-accent);
-    font-size: clamp(4rem, 18vw, 9rem);
+    font-size: 4.5rem;
     font-variant-numeric: tabular-nums;
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 0.95;
     margin: 0;
+}
+
+@media (min-width: 36rem) {
+    .onelife-summary__hero {
+        font-size: 7rem;
+    }
+}
+
+@media (min-width: 62rem) {
+    .onelife-summary__hero {
+        font-size: 9rem;
+    }
 }
 
 .onelife-summary__herolabel {
