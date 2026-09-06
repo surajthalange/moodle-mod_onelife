@@ -117,6 +117,33 @@ final class engine {
     }
 
     /**
+     * Choose the next question to ask from a pool.
+     *
+     * Only the choice lives here. Building the pool needs the question bank, the
+     * category tree and the version table, so question_repository does that and
+     * hands the result in. Splitting it that way is what keeps this class free of
+     * the database, which basic_testcase enforces.
+     *
+     * Returns null when nothing is left rather than throwing: running out of
+     * questions is an ordinary end to a run, not a fault, and the caller closes the
+     * run cleanly on null.
+     *
+     * @param int[] $pool candidate question ids
+     * @param int[] $excludequestionids ids already answered in this run
+     * @return int|null the chosen question id, or null when the pool is exhausted
+     */
+    public static function select_question_id(array $pool, array $excludequestionids): ?int {
+        $remaining = array_values(array_diff($pool, $excludequestionids));
+
+        if ($remaining === []) {
+            return null;
+        }
+
+        // Sampled rather than ordered: a fixed order would make every run identical.
+        return (int) $remaining[random_int(0, count($remaining) - 1)];
+    }
+
+    /**
      * Score one chosen answer against its question.
      *
      * The question must already carry its answers, keyed by answer id, exactly as

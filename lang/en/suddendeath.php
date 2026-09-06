@@ -32,6 +32,7 @@ $string['allowedmodes_help'] = 'Which ways of choosing what to practise the lear
 * **All topics** - the learner plays the whole bank.
 
 At least one must be permitted.';
+$string['answerrefused'] = 'That answer could not be accepted. Here is where your run actually is.';
 $string['choosescope'] = 'What would you like to practise?';
 $string['choosetopic'] = 'Choose a topic';
 $string['choosetopics'] = 'Choose one or more topics';
@@ -61,6 +62,7 @@ This lets you write a short congratulatory line for the question bank and a long
 > Photosynthesis converts light energy into chemical energy stored as glucose.
 
 Be aware of this if you already use horizontal rules for visual separation: the first one will split your feedback, and everything above it will be hidden from the learner.';
+$string['finalstreak'] = 'You reached a streak of {$a}.';
 $string['mode_all'] = 'All topics';
 $string['mode_multi'] = 'Selected topics';
 $string['mode_single'] = 'One topic';
@@ -72,10 +74,13 @@ The learner chooses which topics to practise and answers multiple-choice questio
 The activity is deliberately ungraded, making it low-stakes practice rather than assessment.';
 $string['modulenameplural'] = 'Sudden Death activities';
 $string['noinstances'] = 'There are no Sudden Death activities in this course.';
+$string['playagain'] = 'Back to the activity';
 $string['pluginadministration'] = 'Sudden Death administration';
 $string['pluginname'] = 'Sudden Death';
-$string['runwouldstart'] = 'Your choice was accepted. Playing a run arrives in the next build step.';
+$string['poolexhausted'] = 'You answered every available question correctly. There are no more questions to ask.';
+$string['runover'] = 'Run over';
 $string['startrun'] = 'Start';
+$string['streaksofar'] = 'Streak: {$a}';
 $string['suddendeath:addinstance'] = 'Add a new Sudden Death activity';
 $string['suddendeath:play'] = 'Play a Sudden Death run';
 $string['suddendeath:view'] = 'View a Sudden Death activity';
@@ -85,6 +90,7 @@ $string['targetstreak'] = 'Target streak';
 $string['targetstreak_help'] = 'The streak that counts as 100% in the run summary.
 
 It does not cap the run. A learner may keep going past it, and the streak itself is reported uncapped.';
+$string['thecorrectanswerwas'] = 'The correct answer was';
 $string['topicbank'] = 'Topic bank';
 $string['topicbank_help'] = 'The question category whose child categories become the topics a learner can choose from.
 

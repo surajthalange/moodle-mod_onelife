@@ -1,0 +1,91 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_suddendeath/summary
+
+    The end of a Sudden Death run.
+
+    A run that ended because the pool ran out is reported as such rather than as a
+    loss, because the learner got nothing wrong.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * cmid number The course module id
+    * streak number The streak reached
+    * targetstreak number The streak counting as 100 per cent
+    * percent number The streak as a percentage of the target, capped at 100
+    * correctanswer string The correct answer's text
+    * hascorrectanswer boolean Whether there is a correct answer to show
+    * explanation string The explanation, already formatted
+    * hasexplanation boolean Whether there is an explanation to show
+    * exhausted boolean Whether the run ended because the pool ran out
+    * exhaustedmessage string The message explaining that
+    * sesskey string The session key
+
+    Example context (json):
+    {
+        "cmid": 42,
+        "streak": 7,
+        "targetstreak": 15,
+        "percent": 47,
+        "correctanswer": "Mitochondrion",
+        "hascorrectanswer": true,
+        "explanation": "<p>ATP is made in the mitochondrion.</p>",
+        "hasexplanation": true,
+        "exhausted": false,
+        "exhaustedmessage": "",
+        "sesskey": "abc123"
+    }
+}}
+<div class="suddendeath-summary">
+
+    <h3 class="suddendeath-summary__heading">{{#str}} runover, mod_suddendeath {{/str}}</h3>
+
+    <p class="suddendeath-summary__score" role="status">
+        {{#str}} finalstreak, mod_suddendeath, {{streak}} {{/str}}
+        <span class="suddendeath-summary__percent">{{percent}}%</span>
+    </p>
+
+    {{#exhausted}}
+        <div class="alert alert-info suddendeath-summary__exhausted" role="alert">{{exhaustedmessage}}</div>
+    {{/exhausted}}
+
+    {{^exhausted}}
+        {{#hascorrectanswer}}
+            <p class="suddendeath-summary__correct">
+                {{#str}} thecorrectanswerwas, mod_suddendeath {{/str}}
+                <strong>{{correctanswer}}</strong>
+            </p>
+        {{/hascorrectanswer}}
+    {{/exhausted}}
+
+    {{#hasexplanation}}
+        <div class="suddendeath-summary__explanation">{{{explanation}}}</div>
+    {{/hasexplanation}}
+
+    <p class="suddendeath-summary__actions">
+        <a href="{{{config.wwwroot}}}/mod/suddendeath/view.php?id={{cmid}}" class="btn btn-primary">
+            {{#str}} playagain, mod_suddendeath {{/str}}
+        </a>
+    </p>
+
+</div>

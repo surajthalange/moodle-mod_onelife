@@ -46,4 +46,24 @@ class renderer extends plugin_renderer_base {
     protected function render_picker_page(picker_page $page): string {
         return $this->render_from_template('mod_suddendeath/picker', $page->export_for_template($this));
     }
+
+    /**
+     * Render one question in a run.
+     *
+     * @param play_page $page the renderable
+     * @return string the rendered HTML
+     */
+    protected function render_play_page(play_page $page): string {
+        return $this->render_from_template('mod_suddendeath/play', $page->export_for_template($this));
+    }
+
+    /**
+     * Render the end of a run.
+     *
+     * @param summary_page $page the renderable
+     * @return string the rendered HTML
+     */
+    protected function render_summary_page(summary_page $page): string {
+        return $this->render_from_template('mod_suddendeath/summary', $page->export_for_template($this));
+    }
 }

@@ -31,6 +31,8 @@ require_once($CFG->libdir . '/completionlib.php');
 
 use mod_suddendeath\form\scope_picker_form;
 use mod_suddendeath\local\modes;
+use mod_suddendeath\local\run_manager;
+use mod_suddendeath\local\scope_validator;
 use mod_suddendeath\output\picker_page;
 use mod_suddendeath\topic_repository;
 
@@ -86,10 +88,29 @@ if ($playable) {
     ]);
 
     if ($submitted = $form->get_data()) {
-        // Build step 6 starts the run here. Until run_manager exists the picker
-        // validates and stops, rather than pretending to start something.
         require_capability('mod/suddendeath:play', $context);
-        $warnings[] = get_string('runwouldstart', 'mod_suddendeath');
+
+        $scopetype = (string) $submitted->scopetype;
+        if ($scopetype === modes::ALL) {
+            $chosentopics = array_map('intval', array_keys($topics));
+        } else {
+            $chosentopics = scope_validator::chosen_topics($scopetype, (array) $submitted);
+        }
+
+        // An already open run is returned untouched by start_or_resume, so submitting the
+        // picker while a run is in progress resumes it rather than re-rolling.
+        $run = (new run_manager())->start_or_resume(
+            $moduleinstance,
+            (int) $USER->id,
+            $scopetype,
+            $chosentopics
+        );
+
+        if ($run !== null) {
+            redirect(new moodle_url('/mod/suddendeath/play.php', ['id' => $cm->id]));
+        }
+
+        $warnings[] = get_string('errnotopicsinbank', 'mod_suddendeath');
     }
 
     $formhtml = $form->render();
