@@ -42,6 +42,13 @@
     * haswarnings boolean Whether there are warnings to show
     * warnings array List of warnings
       * message string The warning text
+    * hasrecords boolean Whether the viewer has any personal records yet
+    * records array The viewer's personal bests, best scope first
+      * scope string The scope, named the way the picker names it
+      * beststreak number The best streak in that scope
+      * laststreak number The streak in the most recent run
+      * lasttime string When the most recent run finished
+      * totalruns number How many runs in that scope
 
     Example context (json):
     {
@@ -54,6 +61,16 @@
         "haswarnings": true,
         "warnings": [
             {"message": "The configured topic bank is no longer usable."}
+        ],
+        "hasrecords": true,
+        "records": [
+            {
+                "scope": "All topics",
+                "beststreak": 12,
+                "laststreak": 4,
+                "lasttime": "6/09/26",
+                "totalruns": 7
+            }
         ]
     }
 }}
@@ -78,5 +95,37 @@
             {{{formhtml}}}
         </div>
     {{/hasnotice}}
+
+    <section class="suddendeath-records">
+        <h3 class="suddendeath-records__heading">{{#str}} personalrecords, mod_suddendeath {{/str}}</h3>
+
+        {{^hasrecords}}
+            <p class="suddendeath-records__none">{{#str}} norecordsyet, mod_suddendeath {{/str}}</p>
+        {{/hasrecords}}
+
+        {{#hasrecords}}
+            <table class="table table-sm suddendeath-records__table">
+                <caption class="sr-only visually-hidden">{{#str}} personalrecords, mod_suddendeath {{/str}}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{{#str}} recordscope, mod_suddendeath {{/str}}</th>
+                        <th scope="col">{{#str}} recordbest, mod_suddendeath {{/str}}</th>
+                        <th scope="col">{{#str}} recordlast, mod_suddendeath {{/str}}</th>
+                        <th scope="col">{{#str}} recordruns, mod_suddendeath {{/str}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#records}}
+                        <tr>
+                            <th scope="row" class="suddendeath-records__scope">{{scope}}</th>
+                            <td class="suddendeath-records__best">{{beststreak}}</td>
+                            <td class="suddendeath-records__last">{{laststreak}} <small>{{lasttime}}</small></td>
+                            <td class="suddendeath-records__runs">{{totalruns}}</td>
+                        </tr>
+                    {{/records}}
+                </tbody>
+            </table>
+        {{/hasrecords}}
+    </section>
 
 </div>

@@ -113,7 +113,11 @@ class run_manager {
         $run->suddendeathid = (int) $instance->id;
         $run->userid = $userid;
         $run->scopetype = $scopetype;
-        $run->topicids = implode(',', array_map('intval', $topicids));
+        // Stored sorted and deduplicated, so two runs over the same set of topics
+        // group into one personal record however the learner ticked them.
+        $canonical = array_values(array_unique(array_map('intval', $topicids)));
+        sort($canonical, SORT_NUMERIC);
+        $run->topicids = implode(',', $canonical);
         $run->streak = 0;
         $run->targetstreak = (int) $instance->targetstreak;
         $run->currentquestionid = $firstquestionid;
@@ -216,7 +220,9 @@ class run_manager {
         $result->accepted = true;
         $result->reason = '';
         $result->correct = (bool) $scored->correct;
-        $result->streak = engine::next_streak((int) $current->streak, (bool) $scored->correct);
+        $result->streak = $scored->correct
+            ? engine::next_streak((int) $current->streak, true)
+            : (int) $current->streak;
         $result->finished = !$scored->correct || $exhausted;
         $result->exhausted = $exhausted;
         $result->correctanswerid = $scored->correctanswerid;
@@ -284,7 +290,14 @@ class run_manager {
 
         $update = new stdClass();
         $update->id = $run->id;
-        $update->streak = engine::next_streak((int) $run->streak, $correct);
+
+        if ($correct) {
+            $update->streak = engine::next_streak((int) $run->streak, true);
+        }
+        // On a wrong answer the streak stays at what the learner reached. The streak
+        // is their score, and almost every run ends in a mistake, so resetting it here
+        // would record zero for nearly every run and leave personal bests able to show
+        // only runs that exhausted the pool.
 
         if (!$correct || $nextquestionid === null) {
             $update->timefinish = time();

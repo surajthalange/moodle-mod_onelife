@@ -33,6 +33,7 @@ use mod_suddendeath\form\scope_picker_form;
 use mod_suddendeath\local\modes;
 use mod_suddendeath\local\run_manager;
 use mod_suddendeath\local\scope_validator;
+use mod_suddendeath\local\stats_repository;
 use mod_suddendeath\output\picker_page;
 use mod_suddendeath\topic_repository;
 
@@ -116,8 +117,10 @@ if ($playable) {
     $formhtml = $form->render();
 }
 
+$records = (new stats_repository())->get_records((int) $moduleinstance->id, (int) $USER->id);
+
 $output = $PAGE->get_renderer('mod_suddendeath');
-$page = new picker_page($moduleinstance, $topics, $bank !== null, $formhtml, $warnings);
+$page = new picker_page($moduleinstance, $topics, $bank !== null, $formhtml, $warnings, $records);
 
 echo $OUTPUT->header();
 

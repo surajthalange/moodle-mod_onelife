@@ -24,6 +24,7 @@
 
 namespace mod_suddendeath\output;
 
+use mod_suddendeath\local\modes;
 use renderer_base;
 use renderable;
 use stdClass;
@@ -59,6 +60,9 @@ class picker_page implements renderable, templatable {
     /** @var string[] Warnings to surface to the viewer. */
     private array $warnings;
 
+    /** @var stdClass[] The viewer's personal records, best scope first. */
+    private array $records;
+
     /**
      * Constructor.
      *
@@ -67,19 +71,41 @@ class picker_page implements renderable, templatable {
      * @param bool $hasbank whether a usable topic bank was resolved
      * @param string $formhtml the rendered picker form
      * @param string[] $warnings warnings to surface
+     * @param stdClass[] $records the viewer's personal records
      */
     public function __construct(
         stdClass $instance,
         array $topics,
         bool $hasbank,
         string $formhtml = '',
-        array $warnings = []
+        array $warnings = [],
+        array $records = []
     ) {
         $this->instance = $instance;
         $this->topics = $topics;
         $this->hasbank = $hasbank;
         $this->formhtml = $formhtml;
         $this->warnings = $warnings;
+        $this->records = $records;
+    }
+
+    /**
+     * Describe a scope the way the picker describes it.
+     *
+     * Uses the same mode labels the learner chose from and the topic names as
+     * stored, never a raw code or a category id.
+     *
+     * @param stdClass $record the record
+     * @return string the scope description
+     */
+    protected function scope_label(stdClass $record): string {
+        $mode = modes::label($record->scopetype);
+
+        if ($record->topicnames === [] || $record->scopetype === modes::ALL) {
+            return $mode;
+        }
+
+        return $mode . ': ' . implode(', ', $record->topicnames);
     }
 
     /**
@@ -111,6 +137,19 @@ class picker_page implements renderable, templatable {
             $context->warnings[] = ['message' => $warning];
         }
         $context->haswarnings = $this->warnings !== [];
+
+        $context->records = [];
+        foreach ($this->records as $record) {
+            $context->records[] = [
+                'scope' => $this->scope_label($record),
+                'beststreak' => (int) $record->beststreak,
+                'laststreak' => (int) $record->laststreak,
+                'lasttime' => userdate((int) $record->lasttime, get_string('strftimedatefullshort', 'langconfig')),
+                'totalruns' => (int) $record->totalruns,
+            ];
+        }
+        // No records is a normal state for a new activity, not an empty table.
+        $context->hasrecords = $context->records !== [];
 
         return $context;
     }
