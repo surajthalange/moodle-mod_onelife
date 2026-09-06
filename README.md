@@ -8,7 +8,8 @@ from a course's question bank.
 - **Component:** `mod_onelife`
 - **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2
 - **Licence:** GPLv3 or later
-- **Status:** feature complete for v1.0 except Behat coverage
+- **Databases:** MariaDB/MySQL and PostgreSQL, both tested on every supported branch
+- **Status:** stable, v1.0.0
 
 ## What it does
 
@@ -45,7 +46,7 @@ across scopes over time.
 ## Prior art and provenance
 
 The Millionaire-style quiz format is a well-established educational game pattern, also
-implemented by [`mod_game`](https://moodle.org/plugins/mod_game) (GPLv3) by
+implemented by [`mod_game`](https://marketplace.moodle.com/plugins/mod_game) (GPLv3) by
 **Vasilis Daloukas**, credited here as prior art in the same space.
 
 This plugin is a fresh implementation. No source is copied from `mod_game` or from any other
@@ -82,6 +83,13 @@ will not guess.
 
 ## Installation
 
+### From a ZIP package
+
+Site administration → Plugins → Install plugins, upload the ZIP, and follow the prompts. No
+post-installation steps are needed, and the plugin has no dependencies on other plugins.
+
+### From git
+
 Clone into your Moodle tree, then visit **Site administration → Notifications** to complete
 the install.
 
@@ -98,6 +106,21 @@ version:
 
 The directory must be named `onelife`, not the repository name.
 
+## Reporting bugs and requesting features
+
+Use the GitHub issue tracker:
+<https://github.com/surajthalange/moodle-mod_onelife/issues>
+
+Bug reports are most useful with the Moodle version, the PHP version, the database engine,
+and whether debugging was on.
+
+## Licence
+
+GNU General Public License v3 or later. The full text ships in
+[COPYING.txt](COPYING.txt), and every source file carries the standard Moodle GPL header.
+
+Copyright 2026 Suraj Thalange.
+
 ## Development
 
 The working copy lives inside the Moodle tree, so treat this GitHub remote as the backup of
@@ -112,4 +135,9 @@ Checks, from a `moodle-plugin-ci` installation:
 Unit tests, from the Moodle root:
 
     php public/admin/tool/phpunit/cli/init.php
-    php vendor/phpunit/phpunit/phpunit public/mod/onelife/tests/engine_test.php
+    php vendor/phpunit/phpunit/phpunit --testsuite mod_onelife_testsuite
+
+Acceptance tests need a second wwwroot and a matching ChromeDriver:
+
+    php public/admin/tool/behat/cli/init.php
+    php vendor/behat/behat/bin/behat --config <behat_dataroot>/behatrun/behat/behat.yml         --profile chrome --tags @mod_onelife
