@@ -1,6 +1,23 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+# One run per meaningful change, not two.
+#
+# "on: [push, pull_request]" fired twice for the same commit whenever a branch with an
+# open pull request was pushed: once for the push and once for the pull request. With a
+# sixteen entry matrix that is thirty two jobs to learn one thing.
+#
+# Pushes are now watched only on main, so work on a feature branch is validated once,
+# through its pull request. workflow_dispatch covers the case of wanting a run on a
+# branch that has no pull request open yet.
+#
+# Tags deliberately do not trigger a run. A release tag points at a commit that has
+# already passed on main, and the tree is identical, so re-running the matrix on the
+# tag tests nothing new.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
