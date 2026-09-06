@@ -69,13 +69,20 @@
         <input type="hidden" name="questionid" value="{{questionid}}">
         <input type="hidden" name="sesskey" value="{{sesskey}}">
 
+        {{! Question text lives outside the legend: format_text wraps it in block
+            elements, and a legend may only contain phrasing content. }}
+        <div id="suddendeath-question-{{questionid}}" class="suddendeath-play__questiontext">
+            {{{questiontext}}}
+        </div>
+
         <fieldset class="suddendeath-play__question">
-            <legend class="suddendeath-play__questiontext">{{{questiontext}}}</legend>
+            <legend class="sr-only visually-hidden">{{#str}} chooseananswer, mod_suddendeath {{/str}}</legend>
 
             <div class="suddendeath-play__answers">
                 {{#answers}}
                     <button type="submit" name="answerid" value="{{id}}"
-                            class="btn btn-outline-primary suddendeath-play__answer">
+                            class="btn btn-outline-primary suddendeath-play__answer"
+                            aria-describedby="suddendeath-question-{{questionid}}">
                         {{text}}
                     </button>
                 {{/answers}}

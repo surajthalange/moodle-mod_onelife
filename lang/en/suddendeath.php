@@ -33,6 +33,7 @@ $string['allowedmodes_help'] = 'Which ways of choosing what to practise the lear
 
 At least one must be permitted.';
 $string['answerrefused'] = 'That answer could not be accepted. Here is where your run actually is.';
+$string['chooseananswer'] = 'Choose an answer';
 $string['choosescope'] = 'What would you like to practise?';
 $string['choosetopic'] = 'Choose a topic';
 $string['choosetopics'] = 'Choose one or more topics';
