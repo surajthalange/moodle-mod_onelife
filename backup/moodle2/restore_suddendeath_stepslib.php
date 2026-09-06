@@ -33,6 +33,20 @@
  * and silently misreporting which question a learner answered is worse than
  * recording that it is no longer known.
  *
+ * Do not "fix" the empty question mappings by adding annotate_ids('question', ...) to
+ * the backup step. That annotation has been a no-op since question versioning landed:
+ * questions now travel through the question bank steps and add_question_references(),
+ * and core itself, mod_quiz included, no longer relies on the question mapping. Adding
+ * it back makes the code look like it guarantees something it does not, and the
+ * mappings here stay just as empty.
+ *
+ * The real division is by backup level, and it is documented in the README so it reads
+ * as a known constraint rather than a bug. A course backup includes the bank, so
+ * get_mappingid('question', ...) resolves and answers keep their questions. An
+ * activity-only backup does not include the bank, so nothing resolves and the question
+ * references are cleared. Everything else about a run survives either way: streak,
+ * scope, timings, and therefore personal records and statistics.
+ *
  * @package    mod_suddendeath
  * @copyright  2026 Suraj Thalange
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -69,7 +83,6 @@ class restore_suddendeath_activity_structure_step extends restore_activity_struc
         global $DB;
 
         $data = (object) $data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timecreated = $this->apply_date_offset($data->timecreated);

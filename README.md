@@ -51,6 +51,35 @@ implemented by [`mod_game`](https://moodle.org/plugins/mod_game) (GPLv3) by
 This plugin is a fresh implementation. No source is copied from `mod_game` or from any other
 existing plugin.
 
+## Backup and restore
+
+Runs and answers are backed up and restored under the standard **Include user data** setting.
+There is one limitation worth knowing before you rely on it.
+
+**Course-level backups carry question history correctly.** The question bank travels with the
+course, so on restore each recorded answer is remapped onto the question it was actually about.
+Topic categories are remapped too. This is the normal case and it works.
+
+**Activity-level backups cannot.** A backup of the Sudden Death activity on its own does not
+include the question bank, so on restore there is no question to remap onto. Moodle's older
+`annotate_ids('question', ...)` mechanism, which used to bridge this, has not been functional
+since question versioning arrived: questions are pulled in through the question bank steps and
+`add_question_references()` instead, and the annotation is a no-op. This plugin therefore does
+not use it, rather than implying a guarantee that does not hold.
+
+**What to expect if you do it anyway.** The activity restores, and so do the runs, the streaks,
+the scope each run was played over, and the timings. Personal records and statistics stay
+correct, because they are computed from streaks rather than from questions. What is lost is
+which specific question each answer was about: those references are cleared rather than carried
+across, because an untranslated id would point at whatever question happens to occupy it on the
+target site, and silently misreporting which question a learner answered is worse than recording
+that it is no longer known. Any run still in progress at backup time is closed on restore, since
+its question cannot be served.
+
+**If you need the question history, back up at course level.** Restoring an activity into a
+course whose bank already holds the same questions does not help: the ids differ, and the plugin
+will not guess.
+
 ## Installation
 
 Clone into your Moodle tree, then visit **Site administration → Notifications** to complete
