@@ -45,9 +45,13 @@ across scopes over time.
 
 ## Prior art and provenance
 
-The Millionaire-style quiz format is a well-established educational game pattern, also
-implemented by [`mod_game`](https://marketplace.moodle.com/plugins/mod_game) (GPLv3) by
-**Vasilis Daloukas**, credited here as prior art in the same space.
+Quiz games built on the Moodle question bank are well-established ground.
+[`mod_game`](https://marketplace.moodle.com/plugins/mod_game) (GPLv3) by **Vasilis Daloukas**
+has offered them since 2007, including a Millionaire-style game, and is credited here as prior
+art in the same space.
+
+One Life is not a Millionaire clone: there is no ladder, no lifelines and no fixed length. A run
+simply continues until the first wrong answer.
 
 This plugin is a fresh implementation. No source is copied from `mod_game` or from any other
 existing plugin.
@@ -123,8 +127,9 @@ Copyright 2026 Suraj Thalange.
 
 ## Development
 
-The working copy lives inside the Moodle tree, so treat this GitHub remote as the backup of
-record: a Moodle reinstall removes the local directory. Push before wiping a Moodle install.
+The plugin directory must be named `onelife`, whatever the repository is called: Moodle
+resolves the component from the directory name, so a clone left as `moodle-mod_onelife` will
+not load.
 
 Checks, from a `moodle-plugin-ci` installation:
 
@@ -140,4 +145,5 @@ Unit tests, from the Moodle root:
 Acceptance tests need a second wwwroot and a matching ChromeDriver:
 
     php public/admin/tool/behat/cli/init.php
-    php vendor/behat/behat/bin/behat --config <behat_dataroot>/behatrun/behat/behat.yml         --profile chrome --tags @mod_onelife
+    php vendor/behat/behat/bin/behat --config <behat_dataroot>/behatrun/behat/behat.yml \
+        --profile chrome --tags @mod_onelife
