@@ -78,6 +78,72 @@ final class topic_repository_test extends \advanced_testcase {
     }
 
     /**
+     * Create a question category in a context of our choosing, bypassing the generator.
+     *
+     * Needed because the core generator will not put a category in a non-module context
+     * on 5.0+, and core's own question_get_top_category() refuses one outright: it
+     * returns false for any context that is not CONTEXT_MODULE, without even handing
+     * back a top row that already exists. So there is no supported way to build a
+     * course-category bank on a current site, and the generator quietly relocates the
+     * request instead.
+     *
+     * That shape still exists in the wild, on any site upgraded from 4.5, and this is
+     * how it is stored there. Writing the rows directly is the only way to cover it on
+     * 5.0+; the alternative, taken previously, was to skip the case on every version
+     * the plugin is actually likely to run on. Verified against a real 5.2 site before
+     * being written here.
+     *
+     * @param int $contextid the context to file the category in
+     * @param int $parent the parent category id, 0 for the hidden top category
+     * @param string $name the category name
+     * @return stdClass the stored category record
+     */
+    private function make_raw_category(int $contextid, int $parent, string $name): stdClass {
+        global $DB;
+
+        $sortorder = (int) $DB->get_field_sql(
+            'SELECT COALESCE(MAX(sortorder), 0) + 1 FROM {question_categories} WHERE parent = ?',
+            [$parent]
+        );
+
+        $record = (object) [
+            'name' => $name,
+            'contextid' => $contextid,
+            'info' => '',
+            'infoformat' => FORMAT_HTML,
+            'stamp' => make_unique_id_code(),
+            'parent' => $parent,
+            'sortorder' => $sortorder,
+        ];
+        $record->id = $DB->insert_record('question_categories', $record);
+
+        return $record;
+    }
+
+    /**
+     * Build a whole bank in one context: top, bank, one topic, one question.
+     *
+     * @param int $contextid the context to build in
+     * @param string $bankname the bank category name
+     * @param string $topicname the topic category name
+     * @return stdClass the bank category
+     */
+    private function make_raw_bank(int $contextid, string $bankname, string $topicname): stdClass {
+        global $DB;
+
+        $topid = $DB->get_field('question_categories', 'id', ['contextid' => $contextid, 'parent' => 0]);
+        if (!$topid) {
+            $topid = (int) $this->make_raw_category($contextid, 0, 'top')->id;
+        }
+
+        $bank = $this->make_raw_category($contextid, (int) $topid, $bankname);
+        $topic = $this->make_raw_category($contextid, (int) $bank->id, $topicname);
+        $this->make_question((int) $topic->id);
+
+        return $bank;
+    }
+
+    /**
      * Create a question category, returning the record as actually stored.
      *
      * The core generator rewrites contextid on 5.0+: a non-module context causes it to
@@ -224,6 +290,64 @@ final class topic_repository_test extends \advanced_testcase {
 
         $this->assertNotNull($found);
         $this->assertEquals($bank->id, $found->id);
+    }
+
+    /**
+     * A bank at the course category context is found on every supported version.
+     *
+     * The pre-5.0 version of this test is skipped from 5.0 onwards, because the core
+     * generator will not build the shape there. That left the case unverified on 5.0,
+     * 5.1 and 5.2, which are the versions most sites are on, while the walk through
+     * parent contexts stayed in the code for exactly those sites. Building the rows
+     * directly closes that gap.
+     */
+    public function test_bank_at_course_category_context_is_found_on_any_version(): void {
+        $this->resetAfterTest();
+
+        $categoryid = $this->getDataGenerator()->create_category()->id;
+        $course = $this->getDataGenerator()->create_course(['category' => $categoryid]);
+        $catcontextid = (int) context_coursecat::instance($categoryid)->id;
+
+        $bank = $this->make_raw_bank($catcontextid, 'Department bank', 'Shared physics');
+
+        $repository = new topic_repository();
+        $found = $repository->get_topic_bank_category($course->id, null);
+
+        $this->assertNotNull($found, 'The walk through parent contexts must reach the category context.');
+        $this->assertEquals($bank->id, $found->id);
+        $this->assertSame(['Shared physics'], array_values($repository->get_topics($course->id, (int) $found->id)));
+    }
+
+    /**
+     * A nearer bank wins even when its category id is higher.
+     *
+     * Resolution must be by context distance, not by id. Ordering by id instead lets a
+     * department or system bank outrank the course's own for as long as it was created
+     * first, which is always. The ids here are deliberately the wrong way round: an
+     * id-ordered implementation passes every other test in this file and fails here.
+     */
+    public function test_a_nearer_bank_wins_over_a_lower_id_bank_further_away(): void {
+        $this->resetAfterTest();
+
+        $categoryid = $this->getDataGenerator()->create_category()->id;
+        $course = $this->getDataGenerator()->create_course(['category' => $categoryid]);
+        $catcontextid = (int) context_coursecat::instance($categoryid)->id;
+        $coursecontextid = (int) context_course::instance($course->id)->id;
+
+        $far = $this->make_raw_bank($catcontextid, 'Department bank', 'Shared physics');
+        $near = $this->make_raw_bank($coursecontextid, 'Course bank', 'Course optics');
+
+        $this->assertGreaterThan(
+            $far->id,
+            $near->id,
+            'The nearer bank must have the higher id or this test proves nothing.'
+        );
+
+        $repository = new topic_repository();
+        $found = $repository->get_topic_bank_category($course->id, null);
+
+        $this->assertNotNull($found);
+        $this->assertEquals($near->id, $found->id, 'The nearer context must win despite the higher id.');
     }
 
     /**

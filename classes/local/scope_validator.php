@@ -80,40 +80,67 @@ final class scope_validator {
      */
     public static function chosen_topics(string $scopetype, array $submitted): array {
         if ($scopetype === modes::SINGLE) {
-            $raw = $submitted[self::SINGLE_ELEMENT] ?? null;
-            if ($raw === null || $raw === '') {
-                return [];
-            }
-
-            $ids = [];
-            foreach (is_array($raw) ? $raw : [$raw] as $value) {
-                $id = (int) $value;
-                if ($id > 0) {
-                    $ids[] = $id;
-                }
-            }
-
-            return $ids;
+            return self::single_topic($submitted);
         }
 
         if ($scopetype === modes::MULTI) {
-            $ids = [];
-            foreach ($submitted as $key => $value) {
-                if (strpos((string) $key, self::TOPIC_PREFIX) !== 0 || empty($value)) {
-                    continue;
-                }
-                $id = (int) substr((string) $key, strlen(self::TOPIC_PREFIX));
-                if ($id > 0) {
-                    $ids[] = $id;
-                }
-            }
-            sort($ids);
-
-            return $ids;
+            return self::multi_topics($submitted);
         }
 
         // All-topics mode selects nothing explicitly.
         return [];
+    }
+
+    /**
+     * The topic ids in a one-topic submission.
+     *
+     * The element is read as an array as well as a scalar, because a tampered post can
+     * send either and both must reduce to a list this class can check.
+     *
+     * @param array $submitted the submitted form data
+     * @return int[] the chosen topic ids
+     */
+    private static function single_topic(array $submitted): array {
+        $raw = $submitted[self::SINGLE_ELEMENT] ?? null;
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+
+        $ids = [];
+        foreach (is_array($raw) ? $raw : [$raw] as $value) {
+            $id = (int) $value;
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * The topic ids in a selected-topics submission.
+     *
+     * The ids come from the element names rather than their values, so an unticked box
+     * contributes nothing and a fabricated name yields an id that validate() will find
+     * is not in the bank.
+     *
+     * @param array $submitted the submitted form data
+     * @return int[] the chosen topic ids, sorted
+     */
+    private static function multi_topics(array $submitted): array {
+        $ids = [];
+        foreach ($submitted as $key => $value) {
+            if (strpos((string) $key, self::TOPIC_PREFIX) !== 0 || empty($value)) {
+                continue;
+            }
+            $id = (int) substr((string) $key, strlen(self::TOPIC_PREFIX));
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+        sort($ids);
+
+        return $ids;
     }
 
     /**
@@ -136,27 +163,60 @@ final class scope_validator {
         }
 
         $chosen = self::chosen_topics($scopetype, $submitted);
-        $errors = [];
 
         if ($scopetype === modes::SINGLE) {
-            if (count($chosen) !== 1) {
-                $errors[self::SINGLE_ELEMENT] = get_string('errchooseonetopic', 'mod_suddendeath');
-            } else if (!in_array($chosen[0], $validtopicids, true)) {
-                $errors[self::SINGLE_ELEMENT] = get_string('errunknowntopic', 'mod_suddendeath');
-            }
-        } else if ($scopetype === modes::MULTI) {
-            if ($chosen === []) {
-                $errors[self::TOPIC_GROUP] = get_string('errchooseatopic', 'mod_suddendeath');
-            } else {
-                foreach ($chosen as $topicid) {
-                    if (!in_array($topicid, $validtopicids, true)) {
-                        $errors[self::TOPIC_GROUP] = get_string('errunknowntopic', 'mod_suddendeath');
-                        break;
-                    }
-                }
+            return self::validate_single($chosen, $validtopicids);
+        }
+
+        if ($scopetype === modes::MULTI) {
+            return self::validate_multi($chosen, $validtopicids);
+        }
+
+        // All-topics mode has nothing of its own to check.
+        return [];
+    }
+
+    /**
+     * Check a one-topic submission.
+     *
+     * @param int[] $chosen the topic ids extracted from the submission
+     * @param int[] $validtopicids the topic ids the bank actually offers
+     * @return array element name to error message, empty when valid
+     */
+    private static function validate_single(array $chosen, array $validtopicids): array {
+        if (count($chosen) !== 1) {
+            return [self::SINGLE_ELEMENT => get_string('errchooseonetopic', 'mod_suddendeath')];
+        }
+
+        if (!in_array($chosen[0], $validtopicids, true)) {
+            return [self::SINGLE_ELEMENT => get_string('errunknowntopic', 'mod_suddendeath')];
+        }
+
+        return [];
+    }
+
+    /**
+     * Check a selected-topics submission.
+     *
+     * The error is keyed on the group rather than on a member element, because an error
+     * keyed on a member of a checkbox group is never rendered and the learner would see
+     * the form come back silently unchanged.
+     *
+     * @param int[] $chosen the topic ids extracted from the submission
+     * @param int[] $validtopicids the topic ids the bank actually offers
+     * @return array element name to error message, empty when valid
+     */
+    private static function validate_multi(array $chosen, array $validtopicids): array {
+        if ($chosen === []) {
+            return [self::TOPIC_GROUP => get_string('errchooseatopic', 'mod_suddendeath')];
+        }
+
+        foreach ($chosen as $topicid) {
+            if (!in_array($topicid, $validtopicids, true)) {
+                return [self::TOPIC_GROUP => get_string('errunknowntopic', 'mod_suddendeath')];
             }
         }
 
-        return $errors;
+        return [];
     }
 }

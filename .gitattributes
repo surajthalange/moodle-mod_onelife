@@ -1,0 +1,8 @@
+# Keep line endings LF in the working tree as well as in the repository.
+#
+# Without this, a clone on Windows with core.autocrlf=true checks the files out as
+# CRLF, and any git round-trip such as a stash rewrites them in place. The Moodle
+# coding standard then reports "End of line character is invalid" and treats the
+# stray \r inside multi-line strings as trailing whitespace, on files that are
+# perfectly clean in the repository and in CI.
+* text=auto eol=lf

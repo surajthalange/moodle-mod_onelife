@@ -32,7 +32,8 @@ $string['allowedmodes_help'] = 'Which ways of choosing what to practise the lear
 * **All topics** - the learner plays the whole bank.
 
 At least one must be permitted.';
-$string['answerrefused'] = 'That answer could not be accepted. Here is where your run actually is.';
+$string['answerrefused'] = 'That answer could not be accepted. This is where your run stands now.';
+$string['backtoactivity'] = 'Back to the activity';
 $string['chooseananswer'] = 'Choose an answer';
 $string['choosescope'] = 'What would you like to practise?';
 $string['choosetopic'] = 'Choose a topic';
@@ -81,7 +82,6 @@ $string['modulenameplural'] = 'Sudden Death activities';
 $string['noinstances'] = 'There are no Sudden Death activities in this course.';
 $string['norecordsyet'] = 'No records yet. Play a run and your best streak will appear here.';
 $string['personalrecords'] = 'Your personal records';
-$string['playagain'] = 'Back to the activity';
 $string['pluginadministration'] = 'Sudden Death administration';
 $string['pluginname'] = 'Sudden Death';
 $string['poolexhausted'] = 'You answered every available question correctly. There are no more questions to ask.';
@@ -114,7 +114,7 @@ $string['streaksofar'] = 'Streak: {$a}';
 $string['suddendeath:addinstance'] = 'Add a new Sudden Death activity';
 $string['suddendeath:play'] = 'Play a Sudden Death run';
 $string['suddendeath:view'] = 'View a Sudden Death activity';
-$string['suddendeathname'] = 'Activity name';
+$string['suddendeathname'] = 'Sudden Death name';
 $string['suddendeathname_help'] = 'The name shown to learners on the course page.';
 $string['targetstreak'] = 'Target streak';
 $string['targetstreak_help'] = 'The streak that counts as 100% in the run summary.

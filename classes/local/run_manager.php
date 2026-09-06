@@ -186,19 +186,9 @@ class run_manager {
         // Re-read: the run object came from a rendered page and may be stale.
         $current = $DB->get_record('suddendeath_run', ['id' => $run->id]);
 
-        if (!$current) {
-            return $this->refusal('gone');
-        }
-        if ((int) $current->userid !== $userid) {
-            return $this->refusal('notyours');
-        }
-        if (!empty($current->timefinish)) {
-            return $this->refusal('finished');
-        }
-        // The double-click guard: the second post names a question the run has
-        // already moved past.
-        if ((int) $current->currentquestionid !== $questionid) {
-            return $this->refusal('stale');
+        $refusal = $this->refuse_submission($current, $userid, $questionid);
+        if ($refusal !== null) {
+            return $refusal;
         }
 
         $question = $this->questions->load($questionid);
@@ -383,6 +373,38 @@ class run_manager {
                  WHERE qv.questionid = ?";
 
         return (int) $DB->get_field_sql($sql, [$question->id], IGNORE_MULTIPLE);
+    }
+
+    /**
+     * Decide whether a submission may be accepted at all.
+     *
+     * Kept together and separate from the scoring, because these four checks are the
+     * whole of what stops one learner answering another's run, a finished run being
+     * answered again, and a double-click scoring the same question twice. Reading them
+     * as one list is the point.
+     *
+     * @param stdClass|false|null $current the run as stored, or false when it is gone
+     * @param int $userid the learner submitting
+     * @param int $questionid the question being answered
+     * @return stdClass|null a refusal outcome, or null when the submission may proceed
+     */
+    protected function refuse_submission($current, int $userid, int $questionid): ?stdClass {
+        if (!$current) {
+            return $this->refusal('gone');
+        }
+        if ((int) $current->userid !== $userid) {
+            return $this->refusal('notyours');
+        }
+        if (!empty($current->timefinish)) {
+            return $this->refusal('finished');
+        }
+        // The double-click guard: the second post names a question the run has
+        // already moved past.
+        if ((int) $current->currentquestionid !== $questionid) {
+            return $this->refusal('stale');
+        }
+
+        return null;
     }
 
     /**
