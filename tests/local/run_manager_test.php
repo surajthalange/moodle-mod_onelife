@@ -276,6 +276,40 @@ final class run_manager_test extends \advanced_testcase {
     }
 
     /**
+     * A wrong answer keeps the streak the learner reached as their score.
+     *
+     * The streak is the score, and almost every run ends in a wrong answer. Resetting
+     * it to zero on the way out would record 0 for nearly every run, leaving personal
+     * bests able to show only runs that exhausted the pool.
+     */
+    public function test_wrong_answer_keeps_the_streak_reached(): void {
+        global $DB;
+
+        $this->set_up_activity(4);
+
+        $manager = new run_manager();
+        $run = $this->start();
+
+        // Two correct answers, then one wrong.
+        for ($i = 0; $i < 2; $i++) {
+            $questionid = (int) $run->currentquestionid;
+            $manager->answer($run, $this->userid, $questionid, $this->correct_answer_id($questionid));
+            $run = $manager->get_in_progress_run((int) $this->instance->id, $this->userid);
+        }
+
+        $questionid = (int) $run->currentquestionid;
+        $result = $manager->answer($run, $this->userid, $questionid, $this->wrong_answer_id($questionid));
+
+        $this->assertTrue($result->finished);
+        $this->assertSame(2, $result->streak, 'The reported score must be the streak reached.');
+        $this->assertSame(
+            2,
+            (int) $DB->get_field('suddendeath_run', 'streak', ['id' => $run->id]),
+            'The stored score must be the streak reached, not zero.'
+        );
+    }
+
+    /**
      * A wrong answer ends the run: that is the whole format.
      */
     public function test_wrong_answer_finishes_the_run(): void {

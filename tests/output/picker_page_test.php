@@ -43,6 +43,22 @@ use stdClass;
  */
 final class picker_page_test extends \advanced_testcase {
     /**
+     * A minimal activity instance.
+     *
+     * @param string $allowedmodes the allowedmodes column value
+     * @return stdClass the instance
+     */
+    private function instance_stub(string $allowedmodes): stdClass {
+        $instance = new stdClass();
+        $instance->id = 1;
+        $instance->name = 'Revision Sprint';
+        $instance->allowedmodes = $allowedmodes;
+        $instance->targetstreak = 15;
+
+        return $instance;
+    }
+
+    /**
      * Export a picker page and return the template context.
      *
      * @param string $allowedmodes the instance's allowedmodes column
@@ -61,13 +77,7 @@ final class picker_page_test extends \advanced_testcase {
     ): stdClass {
         global $PAGE;
 
-        $instance = new stdClass();
-        $instance->id = 1;
-        $instance->name = 'Revision Sprint';
-        $instance->allowedmodes = $allowedmodes;
-        $instance->targetstreak = 15;
-
-        $page = new picker_page($instance, $topics, $hasbank, $formhtml, $warnings);
+        $page = new picker_page($this->instance_stub($allowedmodes), $topics, $hasbank, $formhtml, $warnings);
 
         return $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
     }
@@ -146,6 +156,148 @@ final class picker_page_test extends \advanced_testcase {
         $html = $this->render_form(['multi'], [11 => 'Cells']);
 
         $this->assertStringContainsString('name="topic_11"', $html);
+    }
+
+    /**
+     * Build a personal record of the shape stats_repository returns.
+     *
+     * @param string $scopetype the mode
+     * @param string[] $topicnames the resolved topic names
+     * @param int $best the best streak
+     * @return stdClass the record
+     */
+    private function record(string $scopetype, array $topicnames, int $best = 9): stdClass {
+        $record = new stdClass();
+        $record->key = $scopetype . ':x';
+        $record->scopetype = $scopetype;
+        $record->topicids = [11];
+        $record->topicnames = $topicnames;
+        $record->beststreak = $best;
+        $record->laststreak = 3;
+        $record->lasttime = time() - 3600;
+        $record->totalruns = 4;
+        return $record;
+    }
+
+    /**
+     * With no records the page says so rather than rendering an empty table.
+     */
+    public function test_no_records_says_so_without_a_table(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $context = $this->export('all', [11 => 'Cells']);
+
+        $this->assertFalse($context->hasrecords);
+        $this->assertSame([], $context->records);
+
+        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
+        $this->assertStringContainsString(get_string('norecordsyet', 'mod_suddendeath'), $html);
+        $this->assertStringNotContainsString('suddendeath-records__table', $html);
+    }
+
+    /**
+     * A scope is named the way the picker names it, not by code or category id.
+     */
+    public function test_records_name_the_scope_in_the_pickers_language(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $page = new picker_page(
+            $this->instance_stub('single,multi,all'),
+            [11 => 'Cells'],
+            true,
+            '<form></form>',
+            [],
+            [$this->record('multi', ['Cells', 'Genetics'])]
+        );
+        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+
+        $scope = $context->records[0]['scope'];
+        $this->assertStringContainsString(get_string('mode_multi', 'mod_suddendeath'), $scope);
+        $this->assertStringContainsString('Cells', $scope);
+        $this->assertStringContainsString('Genetics', $scope);
+        $this->assertStringNotContainsString('multi:', $scope, 'A raw code must never be shown.');
+    }
+
+    /**
+     * All-topics scopes are named by their mode alone.
+     */
+    public function test_all_topics_scope_is_named_by_mode_alone(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $page = new picker_page(
+            $this->instance_stub('all'),
+            [11 => 'Cells'],
+            true,
+            '<form></form>',
+            [],
+            [$this->record('all', ['Cells', 'Genetics'])]
+        );
+        $context = $page->export_for_template($PAGE->get_renderer('mod_suddendeath'));
+
+        $this->assertSame(get_string('mode_all', 'mod_suddendeath'), $context->records[0]['scope']);
+    }
+
+    /**
+     * A scope whose topic has since been deleted still renders.
+     *
+     * stats_repository substitutes a placeholder for the missing name, and the page
+     * must show it rather than failing or leaving a blank.
+     */
+    public function test_deleted_topic_scope_still_renders(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $page = new picker_page(
+            $this->instance_stub('single'),
+            [11 => 'Cells'],
+            true,
+            '<form></form>',
+            [],
+            [$this->record('single', [get_string('deletedtopic', 'mod_suddendeath')])]
+        );
+        $context = $page->export_for_template($renderer);
+
+        $this->assertTrue($context->hasrecords);
+        $this->assertStringContainsString(
+            get_string('deletedtopic', 'mod_suddendeath'),
+            $context->records[0]['scope']
+        );
+
+        $html = $renderer->render_from_template('mod_suddendeath/picker', $context);
+        $this->assertStringContainsString(get_string('deletedtopic', 'mod_suddendeath'), $html);
+    }
+
+    /**
+     * Records render as a table with the streaks in it.
+     */
+    public function test_records_render_in_a_table(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $renderer = $PAGE->get_renderer('mod_suddendeath');
+        $page = new picker_page(
+            $this->instance_stub('all'),
+            [11 => 'Cells'],
+            true,
+            '<form></form>',
+            [],
+            [$this->record('all', [], 12)]
+        );
+        $html = $renderer->render_from_template('mod_suddendeath/picker', $page->export_for_template($renderer));
+
+        $this->assertStringContainsString('suddendeath-records__table', $html);
+        $this->assertStringContainsString('12', $html);
+        $this->assertStringNotContainsString(get_string('norecordsyet', 'mod_suddendeath'), $html);
     }
 
     /**
