@@ -15,7 +15,11 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Displays a single Sudden Death activity.
+ * Displays the scope picker for a Sudden Death activity.
+ *
+ * A thin controller: it resolves the module, checks access, asks the repository for
+ * topics, hands them to a renderable and renders. No business logic, no direct
+ * database queries and no inline HTML live here.
  *
  * @package    mod_suddendeath
  * @copyright  2026 Suraj Thalange
@@ -23,8 +27,12 @@
  */
 
 require('../../config.php');
-require_once($CFG->dirroot . '/mod/suddendeath/lib.php');
 require_once($CFG->libdir . '/completionlib.php');
+
+use mod_suddendeath\form\scope_picker_form;
+use mod_suddendeath\local\modes;
+use mod_suddendeath\output\picker_page;
+use mod_suddendeath\topic_repository;
 
 $id = optional_param('id', 0, PARAM_INT);
 $s = optional_param('s', 0, PARAM_INT);
@@ -52,7 +60,6 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('suddendeath', $moduleinstance);
 $event->trigger();
 
-// Required by the FEATURE_COMPLETION_TRACKS_VIEWS rule.
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
@@ -62,8 +69,36 @@ $PAGE->set_cm($cm, $course, $moduleinstance);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
+$repository = new topic_repository();
+$bank = $repository->get_topic_bank_category((int) $course->id, $moduleinstance->topicbankcategoryid);
+$topics = $bank ? $repository->get_topics((int) $course->id, (int) $bank->id) : [];
+$warnings = $repository->get_warnings();
+$allowedmodes = modes::from_storage($moduleinstance->allowedmodes);
+
+$formhtml = '';
+$playable = $bank !== null && $topics !== [] && $allowedmodes !== [];
+
+if ($playable) {
+    $form = new scope_picker_form(null, [
+        'modes' => $allowedmodes,
+        'topics' => $topics,
+        'cmid' => $cm->id,
+    ]);
+
+    if ($submitted = $form->get_data()) {
+        // Build step 6 starts the run here. Until run_manager exists the picker
+        // validates and stops, rather than pretending to start something.
+        require_capability('mod/suddendeath:play', $context);
+        $warnings[] = get_string('runwouldstart', 'mod_suddendeath');
+    }
+
+    $formhtml = $form->render();
+}
+
+$output = $PAGE->get_renderer('mod_suddendeath');
+$page = new picker_page($moduleinstance, $topics, $bank !== null, $formhtml, $warnings);
+
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($moduleinstance->name));
 
 if (trim(strip_tags($moduleinstance->intro))) {
     echo $OUTPUT->box(
@@ -73,9 +108,5 @@ if (trim(strip_tags($moduleinstance->intro))) {
     );
 }
 
-echo $OUTPUT->notification(
-    get_string('scaffoldnotice', 'mod_suddendeath'),
-    \core\output\notification::NOTIFY_INFO
-);
-
+echo $output->render($page);
 echo $OUTPUT->footer();

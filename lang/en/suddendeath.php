@@ -32,13 +32,21 @@ $string['allowedmodes_help'] = 'Which ways of choosing what to practise the lear
 * **All topics** - the learner plays the whole bank.
 
 At least one must be permitted.';
+$string['choosescope'] = 'What would you like to practise?';
+$string['choosetopic'] = 'Choose a topic';
+$string['choosetopics'] = 'Choose one or more topics';
 $string['completionstreak'] = 'Learner must reach a streak of';
 $string['completionstreak_help'] = 'When set, the activity is marked complete once the learner reaches this streak in a single run. Leave it blank, or set it to 0, to disable the rule.';
 $string['completionstreakgroup'] = 'Reach a streak';
+$string['errchooseatopic'] = 'Choose at least one topic.';
+$string['errchooseonetopic'] = 'Choose exactly one topic.';
 $string['errcompletionstreak'] = 'Enter a whole number of 0 or more, or leave this blank to disable the rule.';
+$string['errmodenotallowed'] = 'That is not one of the options offered for this activity.';
 $string['errnomodes'] = 'Permit at least one scope mode.';
+$string['errnotopicsinbank'] = 'This activity has no topics to practise yet.';
 $string['errtargetstreak'] = 'Enter a whole number of 1 or more.';
 $string['errtopicbank'] = 'That topic bank is not available to this course. Choose another, or use auto-detect.';
+$string['errunknowntopic'] = 'That topic is not part of this activity.';
 $string['explanationconvention'] = 'Explanations in question feedback';
 $string['explanationconvention_help'] = 'After each answer, Sudden Death shows the learner an explanation taken from the question\'s general feedback.
 
@@ -66,7 +74,8 @@ $string['modulenameplural'] = 'Sudden Death activities';
 $string['noinstances'] = 'There are no Sudden Death activities in this course.';
 $string['pluginadministration'] = 'Sudden Death administration';
 $string['pluginname'] = 'Sudden Death';
-$string['scaffoldnotice'] = 'This activity is not playable yet. The scope picker and the run loop are still to come.';
+$string['runwouldstart'] = 'Your choice was accepted. Playing a run arrives in the next build step.';
+$string['startrun'] = 'Start';
 $string['suddendeath:addinstance'] = 'Add a new Sudden Death activity';
 $string['suddendeath:play'] = 'Play a Sudden Death run';
 $string['suddendeath:view'] = 'View a Sudden Death activity';
