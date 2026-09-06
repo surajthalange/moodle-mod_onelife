@@ -149,3 +149,70 @@ function suddendeath_delete_instance($id) {
 
     return true;
 }
+
+/**
+ * Add this module's options to the course reset form.
+ *
+ * Without this the module is listed under "these activities can't be reset", which
+ * leaves a teacher no way to clear a year's runs before reusing the course.
+ *
+ * @param MoodleQuickForm $mform the course reset form
+ */
+function suddendeath_reset_course_form_definition($mform) {
+    $mform->addElement('header', 'suddendeathheader', get_string('modulenameplural', 'mod_suddendeath'));
+    $mform->addElement('advcheckbox', 'reset_suddendeath_all', get_string('resetruns', 'mod_suddendeath'));
+}
+
+/**
+ * Default state of this module's reset options.
+ *
+ * Ticked by default, matching every other activity: a teacher resetting a course
+ * for a new cohort expects learner data to go.
+ *
+ * @param stdClass $course the course being reset
+ * @return array default values keyed by form element name
+ */
+function suddendeath_reset_course_form_defaults($course) {
+    return ['reset_suddendeath_all' => 1];
+}
+
+/**
+ * Remove learner data for every Sudden Death activity in a course.
+ *
+ * Only acts when its own option was ticked. Course reset runs every component in
+ * turn, so treating an absent setting as consent would destroy runs during a reset
+ * a teacher asked for something else entirely.
+ *
+ * @param stdClass $data the submitted reset form data, including courseid
+ * @return array one status row per action taken, in the shape core's report expects
+ */
+function suddendeath_reset_userdata($data) {
+    global $DB;
+
+    if (empty($data->reset_suddendeath_all)) {
+        return [];
+    }
+
+    $instanceids = $DB->get_fieldset_select('suddendeath', 'id', 'course = ?', [$data->courseid]);
+
+    if (!empty($instanceids)) {
+        // Answers hang off runs, so clear them first to avoid orphan rows. Scoping the
+        // delete through the run table rather than by course id keeps another course's
+        // answers out of it even if two courses ever shared a run id.
+        [$insql, $params] = $DB->get_in_or_equal($instanceids);
+        $DB->delete_records_select(
+            'suddendeath_answer',
+            "runid IN (SELECT id FROM {suddendeath_run} WHERE suddendeathid {$insql})",
+            $params
+        );
+        $DB->delete_records_select('suddendeath_run', "suddendeathid {$insql}", $params);
+    }
+
+    // Reported whether or not anything was found, because "nothing to delete" is
+    // still an answer to what the teacher asked for.
+    return [[
+        'component' => get_string('modulenameplural', 'mod_suddendeath'),
+        'item' => get_string('runsdeleted', 'mod_suddendeath'),
+        'error' => false,
+    ]];
+}
