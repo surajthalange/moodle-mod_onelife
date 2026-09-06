@@ -276,4 +276,68 @@ final class engine_test extends \basic_testcase {
         $this->assertTrue($result->valid);
         $this->assertFalse($result->correct);
     }
+
+    /**
+     * Choosing from a pool never returns something already answered in this run.
+     *
+     * The pool itself is built by question_repository, which queries. Only the
+     * choice is here, which is what keeps this class free of the database.
+     */
+    public function test_select_question_id_excludes_already_answered(): void {
+        $chosen = engine::select_question_id([11, 12, 13], [11, 13]);
+
+        $this->assertSame(12, $chosen);
+    }
+
+    /**
+     * An exhausted pool returns null rather than an error.
+     *
+     * The caller ends the run cleanly on null. Throwing here would make running out
+     * of questions look like a fault, which it is not.
+     */
+    public function test_select_question_id_returns_null_when_exhausted(): void {
+        $this->assertNull(engine::select_question_id([11, 12], [11, 12]));
+        $this->assertNull(engine::select_question_id([], []));
+        $this->assertNull(engine::select_question_id([], [11]));
+    }
+
+    /**
+     * With nothing excluded, the choice comes from the pool.
+     */
+    public function test_select_question_id_picks_from_the_pool(): void {
+        for ($i = 0; $i < 20; $i++) {
+            $this->assertContains(engine::select_question_id([11, 12, 13], []), [11, 12, 13]);
+        }
+    }
+
+    /**
+     * A single remaining candidate is returned deterministically.
+     */
+    public function test_select_question_id_returns_the_only_candidate(): void {
+        $this->assertSame(12, engine::select_question_id([11, 12], [11]));
+    }
+
+    /**
+     * Exclusions that are not in the pool are harmless.
+     */
+    public function test_select_question_id_ignores_irrelevant_exclusions(): void {
+        $this->assertSame(11, engine::select_question_id([11], [98, 99]));
+    }
+
+    /**
+     * The choice varies across runs, so a pool is sampled rather than ordered.
+     *
+     * A first-in-list implementation passes every other test here and makes every
+     * run identical, which would defeat the point of a revision tool.
+     */
+    public function test_select_question_id_does_not_always_pick_the_same_one(): void {
+        $pool = range(1, 40);
+        $seen = [];
+
+        for ($i = 0; $i < 40; $i++) {
+            $seen[engine::select_question_id($pool, [])] = true;
+        }
+
+        $this->assertGreaterThan(1, count($seen), 'Selection must not be a fixed order.');
+    }
 }
