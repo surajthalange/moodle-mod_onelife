@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_onelife';
-$plugin->version = 2026090601;
+$plugin->version = 2026090602;
 // Moodle 4.5 LTS is the supported floor (see PRD section 3). 4.1 is deliberately not supported.
 $plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.1.0';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '1.0.0';
