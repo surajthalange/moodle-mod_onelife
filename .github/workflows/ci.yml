@@ -136,11 +136,24 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpunit --fail-on-warning
 
-      # Behat is deliberately absent. There are no feature files yet: Behat coverage is
-      # PRD build step 10, and the activity is not playable until build step 6. Adding
-      # the step now would either fail on a missing suite or pass vacuously, and a step
-      # that cannot fail is worse than no step. Restore it from the upstream
-      # gha.dist.yml, together with the Behat faildump upload, at build step 10.
+      # Behat, added at build step 10 now that tests/behat/onelife.feature exists.
+      # --profile chrome matches the upstream gha.dist.yml: moodle-plugin-ci starts
+      # ChromeDriver and talks to it directly over W3C WebDriver, with no Selenium.
+      - name: Behat features
+        id: behat
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci behat --profile chrome
+
+      # A failed acceptance run is close to unreadable without the page dumps, because
+      # the browser is gone by the time the log is read.
+      - name: Upload Behat faildump
+        if: ${{ failure() && steps.behat.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: behat-faildump-${{ matrix.moodle-branch }}-php${{ matrix.php }}-${{ matrix.database }}
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Mark cancelled jobs as failed.
         if: ${{ cancelled() }}
