@@ -31,12 +31,15 @@
 
 namespace mod_onelife\event;
 
-use context_course;
-use context_module;
+use mod_onelife\activity_fixture_trait;
 use mod_onelife\local\modes;
 use mod_onelife\local\question_repository;
 use mod_onelife\local\run_manager;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../activity_fixture_trait.php');
 
 /**
  * Tests that run_started and run_finished fire once, and only where they should.
@@ -48,63 +51,19 @@ use stdClass;
  * @covers     \mod_onelife\event\run_finished
  */
 final class run_events_test extends \advanced_testcase {
-    /** @var stdClass The activity instance under test. */
-    private stdClass $instance;
-
-    /** @var int The topic category holding the questions. */
-    private int $topicid;
-
-    /** @var int The learner. */
-    private int $userid;
-
-    /** @var int The course module id, which is the event's context instance. */
-    private int $cmid;
+    use activity_fixture_trait;
 
     /**
-     * Build a course, a bank with questions, and an activity instance.
+     * Build the activity and act as its learner.
+     *
+     * Runs only ever start from a learner's own request, so the acting user is the
+     * learner. Driving run_manager with nobody logged in would log every event as
+     * user 0 and quietly make the description assertions meaningless.
      *
      * @param int $questioncount how many questions to put in the topic
      */
-    private function set_up_activity(int $questioncount = 5): void {
-        $this->resetAfterTest();
-
-        $course = $this->getDataGenerator()->create_course();
-        $this->userid = (int) $this->getDataGenerator()->create_user()->id;
-        $this->getDataGenerator()->enrol_user($this->userid, $course->id);
-
-        // Question banks moved into their own module in 5.0. On 4.5 the course context
-        // still holds them, so the bank is placed wherever this version keeps it.
-        if (\core_component::get_component_directory('mod_qbank') !== null) {
-            $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-            $contextid = context_module::instance($qbank->cmid)->id;
-        } else {
-            $contextid = context_course::instance($course->id)->id;
-        }
-
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $bank = $generator->create_question_category(['contextid' => $contextid, 'name' => 'Bank']);
-        $topic = $generator->create_question_category([
-            'contextid' => $bank->contextid,
-            'parent' => $bank->id,
-            'name' => 'Cells',
-        ]);
-        $this->topicid = (int) $topic->id;
-
-        for ($i = 0; $i < $questioncount; $i++) {
-            $generator->create_question('multichoice', 'one_of_four', ['category' => $topic->id]);
-        }
-
-        $this->instance = $this->getDataGenerator()->create_module('onelife', [
-            'course' => $course->id,
-            'targetstreak' => 15,
-            'allowedmodes' => 'single,multi,all',
-        ]);
-        $cm = get_coursemodule_from_instance('onelife', $this->instance->id, $course->id, false, MUST_EXIST);
-        $this->cmid = (int) $cm->id;
-
-        // Runs only ever start from a learner's own request, so the acting user is the
-        // learner. Driving run_manager with nobody logged in would log every event as
-        // user 0 and quietly make the description assertions meaningless.
+    private function set_up_as_learner(int $questioncount = 5): void {
+        $this->set_up_activity($questioncount);
         $this->setUser($this->userid);
     }
 
@@ -199,7 +158,7 @@ final class run_events_test extends \advanced_testcase {
      * Starting a run fires run_started exactly once.
      */
     public function test_starting_a_run_fires_run_started_once(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $sink = $this->redirectEvents();
         $run = $this->start();
@@ -222,7 +181,7 @@ final class run_events_test extends \advanced_testcase {
      * starts and make any report built on the event useless.
      */
     public function test_resuming_a_run_does_not_refire_run_started(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $first = $this->start();
 
@@ -241,7 +200,7 @@ final class run_events_test extends \advanced_testcase {
      * A wrong answer fires run_finished exactly once, carrying the streak reached.
      */
     public function test_a_wrong_answer_fires_run_finished_once(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $manager = new run_manager();
         $run = $this->start($manager);
@@ -271,7 +230,7 @@ final class run_events_test extends \advanced_testcase {
      * the last answer was correct.
      */
     public function test_exhausting_the_pool_fires_run_finished_once(): void {
-        $this->set_up_activity(2);
+        $this->set_up_as_learner(2);
 
         $manager = new run_manager();
         $run = $this->start($manager);
@@ -300,7 +259,7 @@ final class run_events_test extends \advanced_testcase {
      * question is available, so it needs the event as much as answer() does.
      */
     public function test_finishing_directly_fires_run_finished_once(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $manager = new run_manager();
         $run = $this->start($manager);
@@ -322,7 +281,7 @@ final class run_events_test extends \advanced_testcase {
      * has already closed, would log the same run finishing twice.
      */
     public function test_finishing_an_already_closed_run_fires_nothing(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $manager = new run_manager();
         $run = $this->start($manager);
@@ -340,7 +299,7 @@ final class run_events_test extends \advanced_testcase {
      * One full run produces exactly one start and one finish, in that order.
      */
     public function test_a_whole_run_fires_one_of_each(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $sink = $this->redirectEvents();
 
@@ -367,7 +326,7 @@ final class run_events_test extends \advanced_testcase {
      * the answer key.
      */
     public function test_the_events_name_no_question(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $sink = $this->redirectEvents();
         $manager = new run_manager();
@@ -395,7 +354,7 @@ final class run_events_test extends \advanced_testcase {
      * string or a bad field surfaces there rather than here.
      */
     public function test_the_events_describe_themselves(): void {
-        $this->set_up_activity();
+        $this->set_up_as_learner();
 
         $sink = $this->redirectEvents();
         $manager = new run_manager();

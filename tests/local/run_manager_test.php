@@ -31,9 +31,12 @@
 
 namespace mod_onelife\local;
 
-use context_course;
-use context_module;
+use mod_onelife\activity_fixture_trait;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../activity_fixture_trait.php');
 
 /**
  * Tests for the run_manager class.
@@ -44,53 +47,7 @@ use stdClass;
  * @covers     \mod_onelife\local\run_manager
  */
 final class run_manager_test extends \advanced_testcase {
-    /** @var stdClass The activity instance under test. */
-    private stdClass $instance;
-
-    /** @var int The topic category holding the questions. */
-    private int $topicid;
-
-    /** @var int The learner. */
-    private int $userid;
-
-    /**
-     * Build a course, a bank with questions, and an activity instance.
-     *
-     * @param int $questioncount how many questions to put in the topic
-     */
-    private function set_up_activity(int $questioncount = 5): void {
-        $this->resetAfterTest();
-
-        $course = $this->getDataGenerator()->create_course();
-        $this->userid = (int) $this->getDataGenerator()->create_user()->id;
-        $this->getDataGenerator()->enrol_user($this->userid, $course->id);
-
-        if (\core_component::get_component_directory('mod_qbank') !== null) {
-            $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-            $contextid = context_module::instance($qbank->cmid)->id;
-        } else {
-            $contextid = context_course::instance($course->id)->id;
-        }
-
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $bank = $generator->create_question_category(['contextid' => $contextid, 'name' => 'Bank']);
-        $topic = $generator->create_question_category([
-            'contextid' => $bank->contextid,
-            'parent' => $bank->id,
-            'name' => 'Cells',
-        ]);
-        $this->topicid = (int) $topic->id;
-
-        for ($i = 0; $i < $questioncount; $i++) {
-            $generator->create_question('multichoice', 'one_of_four', ['category' => $topic->id]);
-        }
-
-        $this->instance = $this->getDataGenerator()->create_module('onelife', [
-            'course' => $course->id,
-            'targetstreak' => 15,
-            'allowedmodes' => 'single,multi,all',
-        ]);
-    }
+    use activity_fixture_trait;
 
     /**
      * Start a run for the test learner.
