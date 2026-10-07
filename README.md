@@ -9,7 +9,7 @@ from a course's question bank.
 - **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2
 - **Licence:** GPLv3 or later
 - **Databases:** MariaDB/MySQL and PostgreSQL, both tested on every supported branch
-- **Status:** stable, v1.0.0
+- **Status:** stable, v1.0.0, [published in the Moodle plugins directory](https://marketplace.moodle.com/plugins/4140)
 - **Case study:** [How and why it was built](https://surajthalange.github.io/work/mod-onelife/)
 
 ## What it does
@@ -87,6 +87,14 @@ course whose bank already holds the same questions does not help: the ids differ
 will not guess.
 
 ## Installation
+
+### From the Moodle plugins directory
+
+The plugin is listed at
+[marketplace.moodle.com/plugins/4140](https://marketplace.moodle.com/plugins/4140). Site
+administration, Plugins, Install plugins, then Install plugins from the Moodle plugins
+directory, and search for One Life. This is the easiest route and it keeps the site informed
+about later releases.
 
 ### From a ZIP package
 
