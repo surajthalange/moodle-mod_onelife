@@ -10,6 +10,7 @@ from a course's question bank.
 - **Licence:** GPLv3 or later
 - **Databases:** MariaDB/MySQL and PostgreSQL, both tested on every supported branch
 - **Status:** stable, v1.0.0
+- **Case study:** [How and why it was built](https://surajthalange.github.io/work/mod-onelife/)
 
 ## What it does
 
