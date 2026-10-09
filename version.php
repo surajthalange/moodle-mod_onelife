@@ -25,8 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_onelife';
-$plugin->version = 2026090602;
+$plugin->version = 2026101000;
 // Moodle 4.5 LTS is the supported floor (see PRD section 3). 4.1 is deliberately not supported.
 $plugin->requires = 2024100700;
+// Declared as well as required, so a site on an untested release is warned rather than
+// left to find out. 5.3 became the current LTS on 5 October 2026.
+$plugin->supported = [405, 503];
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.0';
+$plugin->release = '1.0.1';

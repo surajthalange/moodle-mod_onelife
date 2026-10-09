@@ -8,10 +8,10 @@ A Moodle activity module giving learners a self-directed, streak-based revision 
 from a course's question bank.
 
 - **Component:** `mod_onelife`
-- **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2
+- **Moodle support:** 4.5 LTS floor; targets 4.5, 5.0, 5.1, 5.2, 5.3
 - **Licence:** GPLv3 or later
 - **Databases:** MariaDB/MySQL and PostgreSQL, both tested on every supported branch
-- **Status:** stable, v1.0.0, [published in the Moodle plugins directory](https://marketplace.moodle.com/plugins/4140)
+- **Status:** stable, v1.0.1, [published in the Moodle plugins directory](https://marketplace.moodle.com/plugins/4140)
 - **Case study:** [How and why it was built](https://surajthalange.github.io/work/mod-onelife/)
 
 ## What it does
