@@ -49,12 +49,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      # Each job pulls its database image from Docker Hub anonymously, and twenty at once
-      # reaches the unauthenticated pull limit: four jobs got no database and then failed
-      # every later step with exit 127, which reads like a code failure and is not one.
-      # Sixteen ran green for months, so the burst is capped below that. The durable fix is
-      # to authenticate the pulls, which needs credentials this workflow does not have.
-      max-parallel: 10
       # PHP versions are the minimum and maximum each Moodle branch is itself tested
       # against, taken from that branch's own .github/workflows/push.yml and
       # cross-checked against its composer.json "php" constraint. They are not guesses,
