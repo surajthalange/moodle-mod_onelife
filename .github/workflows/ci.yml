@@ -58,6 +58,7 @@ jobs:
       #   MOODLE_500_STABLE  PHP 8.2 - 8.4   PHPUnit ^11
       #   MOODLE_501_STABLE  PHP 8.2 - 8.4   PHPUnit ^11
       #   MOODLE_502_STABLE  PHP 8.3 - 8.4   PHPUnit ^11
+      #   MOODLE_503_STABLE  PHP 8.3 - 8.4   PHPUnit ^11
       #
       # 4.5 LTS is the PRD's supported floor and the only branch still on PHPUnit 9.6,
       # which predates the attributes API. That is precisely the gap this workflow
@@ -84,6 +85,10 @@ jobs:
           - {moodle-branch: MOODLE_502_STABLE, php: '8.3', database: mariadb}
           - {moodle-branch: MOODLE_502_STABLE, php: '8.4', database: pgsql}
           - {moodle-branch: MOODLE_502_STABLE, php: '8.4', database: mariadb}
+          - {moodle-branch: MOODLE_503_STABLE, php: '8.3', database: pgsql}
+          - {moodle-branch: MOODLE_503_STABLE, php: '8.3', database: mariadb}
+          - {moodle-branch: MOODLE_503_STABLE, php: '8.4', database: pgsql}
+          - {moodle-branch: MOODLE_503_STABLE, php: '8.4', database: mariadb}
 
     steps:
       - name: Check out repository code

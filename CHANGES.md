@@ -1,5 +1,17 @@
 # Changes
 
+## 1.0.1 (2026-10-10)
+
+Moodle 5.3.
+
+- Declared support for Moodle 5.3, which became the current long term support release on
+  5 October 2026, and added it to the CI matrix on PHP 8.3 and 8.4 against both databases.
+- version.php now carries a supported range as well as a required version, so a site on an
+  untested release is warned rather than left to find out.
+- No code changes. The only question bank change in 5.3 adds a get_action_icon method to
+  bulk_action_base, which this plugin does not extend: it reads the question bank rather
+  than adding anything to its interface.
+
 ## 1.0.0 (2026-09-06)
 
 First release. Published in the [Moodle plugins directory](https://marketplace.moodle.com/plugins/4140).
