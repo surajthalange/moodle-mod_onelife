@@ -6,3 +6,8 @@
 *.log
 Thumbs.db
 .DS_Store
+
+# Release archives built with git archive. Keeping these out matters more than it
+# looks: this repository is packaged whole into the plugin ZIP, so a stray archive
+# here would ship inside the next one.
+/dist/
