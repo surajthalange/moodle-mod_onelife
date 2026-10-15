@@ -27,45 +27,6 @@ jobs:
     name: ${{ matrix.moodle-branch }} / PHP ${{ matrix.php }} / ${{ matrix.database }}
     runs-on: ubuntu-24.04
 
-    # The database images are pulled from Docker Hub with credentials. Anonymous pulls are
-    # limited to about a hundred per six hours counted per client address, and GitHub's
-    # runner addresses are shared, so this matrix can be rate limited by builds belonging
-    # to other people; it has happened once, as forty red jobs that read exactly like code
-    # failures. AWS's mirror of the same images was tried and is worse for this workload:
-    # its anonymous limit is on data transferred rather than on pulls, and three matrices
-    # pushed together exceeded it within seconds.
-    #
-    # Repository secrets arrive as EMPTY STRINGS on pull requests from forks rather than
-    # being absent, so an outside contribution gets a blank login here. If that turns out
-    # to fail the pull rather than fall back to anonymous, the fix is to run the databases
-    # from steps guarded by a fork check instead of as services; do not simply delete the
-    # credentials, or the shared limit comes back.
-    services:
-      postgres:
-        image: ${{ matrix.database == 'pgsql' && 'postgres:17' || '' }}
-        credentials:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        env:
-          POSTGRES_USER: 'postgres'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
-
-      mariadb:
-        image: ${{ matrix.database == 'mariadb' && 'mariadb:11' || '' }}
-        credentials:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
-          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
-          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
-        ports:
-          - 3306:3306
-        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval 10s --health-timeout 5s --health-retries 3
-
     strategy:
       fail-fast: false
       # PHP versions are the minimum and maximum each Moodle branch is itself tested
@@ -110,6 +71,52 @@ jobs:
           - {moodle-branch: MOODLE_503_STABLE, php: '8.4', database: mariadb}
 
     steps:
+      # The databases run from steps rather than as service containers, because a service
+      # container's credentials cannot be made conditional and a fork needs different
+      # behaviour from us.
+      #
+      # Docker Hub's anonymous pull limit is about a hundred per six hours counted per
+      # client address, and GitHub's runner addresses are shared, so this matrix can be
+      # rate limited by builds that have nothing to do with this repository; that has
+      # already cost one round of red jobs that read exactly like code failures. AWS's
+      # mirror of the same images is worse for this workload: its anonymous limit is on
+      # data transferred, and three plugin matrices pushed together exceeded it within
+      # seconds.
+      #
+      # So we authenticate. But repository secrets arrive as EMPTY STRINGS on a pull
+      # request from a fork rather than being absent, and a blank login fails the pull and
+      # takes the whole job with it rather than falling back to an anonymous one — that is
+      # measured, not assumed. Hence the fork check: our runs authenticate, a fork's runs
+      # pull anonymously and still work.
+      - name: Log in to Docker Hub
+        if: github.event.pull_request.head.repo.fork != true
+        uses: docker/login-action@v3
+        with:
+          username: surajthalange
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Started before the checkout and the PHP setup so that the database boots while
+      # composer works, and waited for further down, just before it is first needed.
+      - name: Start PostgreSQL
+        if: matrix.database == 'pgsql'
+        run: >
+          docker run -d --name moodle-db -p 5432:5432
+          -e POSTGRES_USER=postgres
+          -e POSTGRES_HOST_AUTH_METHOD=trust
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+          postgres:17
+
+      - name: Start MariaDB
+        if: matrix.database == 'mariadb'
+        run: >
+          docker run -d --name moodle-db -p 3306:3306
+          -e MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1
+          -e MYSQL_CHARACTER_SET_SERVER=utf8mb4
+          -e MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+          mariadb:11
+
       - name: Check out repository code
         uses: actions/checkout@v6
         with:
@@ -133,6 +140,19 @@ jobs:
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
           sudo locale-gen en_AU.UTF-8
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
+
+      - name: Wait for the database
+        run: |
+          for i in $(seq 1 60); do
+            if [ "$(docker inspect -f '{{.State.Health.Status}}' moodle-db 2>/dev/null)" = healthy ]; then
+              echo "Database healthy after $i checks."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Database did not become healthy within three minutes."
+          docker logs moodle-db || true
+          exit 1
 
       - name: Install moodle-plugin-ci
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
