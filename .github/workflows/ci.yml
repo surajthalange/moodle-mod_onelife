@@ -27,9 +27,18 @@ jobs:
     name: ${{ matrix.moodle-branch }} / PHP ${{ matrix.php }} / ${{ matrix.database }}
     runs-on: ubuntu-24.04
 
+    # The database images come from AWS's mirror of the Docker official images, not from
+    # Docker Hub. Docker Hub's anonymous limit is about a hundred pulls per six hours
+    # counted per client address, and GitHub's runner addresses are shared, so this matrix
+    # can be rate limited by builds that are nothing to do with this repository; forty red
+    # jobs once looked exactly like code failures because of it. Authenticating to Docker
+    # Hub would raise the limit, but repository secrets arrive as empty strings on pull
+    # requests from forks, so that would trade a shared limit for a broken first outside
+    # contribution. The mirror needs no credentials, which means a fork's run behaves
+    # exactly like ours.
     services:
       postgres:
-        image: ${{ matrix.database == 'pgsql' && 'postgres:17' || '' }}
+        image: ${{ matrix.database == 'pgsql' && 'public.ecr.aws/docker/library/postgres:17' || '' }}
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -38,7 +47,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
       mariadb:
-        image: ${{ matrix.database == 'mariadb' && 'mariadb:11' || '' }}
+        image: ${{ matrix.database == 'mariadb' && 'public.ecr.aws/docker/library/mariadb:11' || '' }}
         env:
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
