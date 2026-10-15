@@ -27,18 +27,25 @@ jobs:
     name: ${{ matrix.moodle-branch }} / PHP ${{ matrix.php }} / ${{ matrix.database }}
     runs-on: ubuntu-24.04
 
-    # The database images come from AWS's mirror of the Docker official images, not from
-    # Docker Hub. Docker Hub's anonymous limit is about a hundred pulls per six hours
-    # counted per client address, and GitHub's runner addresses are shared, so this matrix
-    # can be rate limited by builds that are nothing to do with this repository; forty red
-    # jobs once looked exactly like code failures because of it. Authenticating to Docker
-    # Hub would raise the limit, but repository secrets arrive as empty strings on pull
-    # requests from forks, so that would trade a shared limit for a broken first outside
-    # contribution. The mirror needs no credentials, which means a fork's run behaves
-    # exactly like ours.
+    # The database images are pulled from Docker Hub with credentials. Anonymous pulls are
+    # limited to about a hundred per six hours counted per client address, and GitHub's
+    # runner addresses are shared, so this matrix can be rate limited by builds belonging
+    # to other people; it has happened once, as forty red jobs that read exactly like code
+    # failures. AWS's mirror of the same images was tried and is worse for this workload:
+    # its anonymous limit is on data transferred rather than on pulls, and three matrices
+    # pushed together exceeded it within seconds.
+    #
+    # Repository secrets arrive as EMPTY STRINGS on pull requests from forks rather than
+    # being absent, so an outside contribution gets a blank login here. If that turns out
+    # to fail the pull rather than fall back to anonymous, the fix is to run the databases
+    # from steps guarded by a fork check instead of as services; do not simply delete the
+    # credentials, or the shared limit comes back.
     services:
       postgres:
-        image: ${{ matrix.database == 'pgsql' && 'public.ecr.aws/docker/library/postgres:17' || '' }}
+        image: ${{ matrix.database == 'pgsql' && 'postgres:17' || '' }}
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -47,7 +54,10 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
       mariadb:
-        image: ${{ matrix.database == 'mariadb' && 'public.ecr.aws/docker/library/mariadb:11' || '' }}
+        image: ${{ matrix.database == 'mariadb' && 'mariadb:11' || '' }}
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
         env:
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
